@@ -1,6 +1,7 @@
 package com.wallboard.wallboard.resource;
 
 import com.wallboard.wallboard.pbx.PBX;
+import com.wallboard.wallboard.utils.MetadataConverter;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
