@@ -1,0 +1,77 @@
+package com.wallboard.wallboard.resource;
+
+import com.wallboard.wallboard.utils.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+
+@RestController
+@RequestMapping("/resource")
+public class ResourceController {
+    @Autowired
+    private ResourceService resourceService;
+
+    @Operation(summary = "Create a resource", description = "Create a resource")
+    @PostMapping("/create")
+    public ApiResponse<Resource> create(Resource resource) {
+        return new ApiResponse<>(resourceService.create(resource));
+    }
+
+    @Operation(summary = "Update a resource", description = "Update a resource")
+    @PatchMapping("/update")
+    public ApiResponse<Resource> update(Resource resource) {
+        return new ApiResponse<>(resourceService.update(resource));
+    }
+
+    @Operation(summary = "Delete a resource", description = "Delete a resource")
+    @DeleteMapping("/delete")
+    public ApiResponse<String> delete(Long id) {
+        resourceService.delete(id);
+        return new ApiResponse<>("Resource deleted successfully");
+    }
+
+    @Operation(summary = "Find a resource by name", description = "Find a resource by name")
+    @GetMapping("/findByName")
+    public ApiResponse<Resource> findByName(String name) {
+        return new ApiResponse<>(resourceService.findByName(name)) ;
+    }
+
+    @Operation(summary = "Find a resource by type", description = "Find a resource by type")
+    @GetMapping("/findByType")
+    public ApiResponse<List<Resource>> findByType(String type) {
+        return new ApiResponse<>(resourceService.findByType(type));
+    }
+
+    @Operation(summary = "Find a resource by metadata", description = "Find a resource by metadata")
+    @GetMapping("/findByMetadata")
+    public ApiResponse<List<Resource>> findByMetadata(String key, Object value) {
+        return new ApiResponse<>(resourceService.findByMetadata(key, value));
+    }
+
+    @Operation(summary = "Find all resources", description = "Find all resources")
+    @GetMapping("/findAll")
+    public ApiResponse<List<Resource>> findAll() {
+        return new ApiResponse<>(resourceService.findAll());
+    }
+
+    @Operation(summary = "Find a resource by id", description = "Find a resource by id")
+    @GetMapping("/findById")
+    public ApiResponse<Resource> findById(Long id) {
+        return new ApiResponse<>(resourceService.findById(id));
+    }
+
+    @Operation(summary = "Delete a resource by name", description = "Delete a resource by name")
+    @DeleteMapping("/deleteByName")
+    public ApiResponse<String> deleteByName(String name) {
+        resourceService.deleteByName(name);
+        return new ApiResponse<>("Resource deleted successfully");
+    }
+
+    @Operation(summary = "Delete a resource by pbx", description = "Delete a resource by pbx")
+    @DeleteMapping("/deleteByPbx")
+    public ApiResponse<String> deleteByPbx(Long pbxId) {
+        resourceService.deleteByPbxId(pbxId);
+        return new ApiResponse<>("Resource deleted successfully");
+    }
+}
