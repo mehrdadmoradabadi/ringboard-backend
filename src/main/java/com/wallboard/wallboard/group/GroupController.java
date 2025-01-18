@@ -1,8 +1,11 @@
 package com.wallboard.wallboard.group;
 
+import com.wallboard.wallboard.dto.GroupDto;
+import com.wallboard.wallboard.utils.ApiResponse;
+import com.wallboard.wallboard.utils.SearchResponse;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -12,38 +15,54 @@ public class GroupController {
     @Autowired
     private GroupService groupService;
 
-    @RequestMapping("/save")
-    public Group save(Group group) {
-        return groupService.save(group);
+
+    @Operation(summary = "Save a group", description = "Save a group and return the saved group")
+    @PostMapping("/save")
+    public ApiResponse<Group> save(@RequestBody Group group) {
+        return new ApiResponse<>(groupService.save(group));
     }
 
-    @RequestMapping("/delete")
-    public void delete(Group group) {
+    @Operation(summary = "Delete a group", description = "Delete a group")
+    @DeleteMapping("/delete")
+    public ApiResponse<String> delete(@RequestBody Group group) {
         groupService.delete(group);
+        return new ApiResponse<>("Group deleted successfully");
     }
 
-    @RequestMapping("/deleteByName")
-    public void deleteByName(String name) {
+    @Operation(summary = "Delete a group by name", description = "Delete a group by name")
+    @DeleteMapping("/deleteByName")
+    public ApiResponse<String> deleteByName( @RequestBody String name) {
         groupService.deleteByName(name);
+        return new ApiResponse<>("Group deleted successfully");
     }
 
-    @RequestMapping("/findByName")
-    public Group findByName(String name) {
-        return groupService.findByName(name);
+    @Operation(summary = "Find a group by name", description = "Find a group by name and return the group")
+    @GetMapping("/findByName")
+    public ApiResponse<Group> findByName(@PathVariable String name) {
+        return new ApiResponse<>(groupService.findByName(name));
     }
 
-    @RequestMapping("/all")
-    public List<Group> findAll() {
-        return groupService.findAll();
+    @Operation(summary = "Find all groups", description = "Find all groups and return the list of groups")
+    @GetMapping("/all")
+    public ApiResponse<SearchResponse<List<GroupDto>>> findAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(defaultValue = "asc" ) String order,
+            @RequestParam(required = false) String search) {
+
+        return new ApiResponse<>(groupService.findAll(page, sortBy, order, search));
+
     }
 
-    @RequestMapping("/update")
-    public Group update(Group group) {
-        return groupService.update(group);
+    @Operation(summary = "Update a group", description = "Update a group and return the updated group")
+    @PatchMapping("/update")
+    public ApiResponse<Group> update(@RequestBody Group group) {
+        return new ApiResponse<>(groupService.update(group));
     }
 
-    @RequestMapping("/findById")
-    public Group findById(Long id) {
+    @Operation(summary = "Find a group by id", description = "Find a group by id and return the group")
+    @GetMapping("/findById")
+    public Group findById(@PathVariable Long id) {
         return groupService.findById(id);
     }
 }
