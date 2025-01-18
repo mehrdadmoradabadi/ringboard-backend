@@ -39,4 +39,8 @@ public class Group {
             joinColumns = @JoinColumn(name = "group_id"),
             inverseJoinColumns = @JoinColumn(name = "resource_id"))
     private Set<Resource> resources;
+
+    public Group(String name) {
+        this.name = name;
+    }
 }
