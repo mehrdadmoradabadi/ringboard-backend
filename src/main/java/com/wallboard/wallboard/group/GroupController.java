@@ -18,7 +18,7 @@ public class GroupController {
 
     @Operation(summary = "Save a group", description = "Save a group and return the saved group")
     @PostMapping("/save")
-    public ApiResponse<Group> save(@RequestBody Group group) {
+    public ApiResponse<GroupDto> save(@RequestBody Group group) {
         return new ApiResponse<>(groupService.save(group));
     }
 
@@ -38,7 +38,7 @@ public class GroupController {
 
     @Operation(summary = "Find a group by name", description = "Find a group by name and return the group")
     @GetMapping("/findByName")
-    public ApiResponse<Group> findByName(@PathVariable String name) {
+    public ApiResponse<GroupDto> findByName(@PathVariable String name) {
         return new ApiResponse<>(groupService.findByName(name));
     }
 
@@ -50,19 +50,19 @@ public class GroupController {
             @RequestParam(defaultValue = "asc" ) String order,
             @RequestParam(required = false) String search) {
 
-        return new ApiResponse<>(groupService.findAll(page, sortBy, order, search));
+        return new ApiResponse<>(groupService.findAll(page, search, sortBy, order));
 
     }
 
     @Operation(summary = "Update a group", description = "Update a group and return the updated group")
     @PatchMapping("/update")
-    public ApiResponse<Group> update(@RequestBody Group group) {
+    public ApiResponse<GroupDto> update(@RequestBody Group group) {
         return new ApiResponse<>(groupService.update(group));
     }
 
     @Operation(summary = "Find a group by id", description = "Find a group by id and return the group")
     @GetMapping("/findById")
-    public Group findById(@PathVariable Long id) {
+    public GroupDto findById(@PathVariable Long id) {
         return groupService.findById(id);
     }
 }

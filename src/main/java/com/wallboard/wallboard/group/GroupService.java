@@ -6,20 +6,23 @@ import com.wallboard.wallboard.utils.SearchResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.ZonedDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class GroupService {
     @Autowired
     private GroupRepository groupRepository;
-    public Group save(Group group) {
-        return groupRepository.save(group);
+    public GroupDto save(Group group) {
+        return mapToDto(groupRepository.save(group));
     }
 
-    public Group findByName(String name) {
-        return groupRepository.findByName(name);
+    public GroupDto findByName(String name) {
+        return mapToDto(groupRepository.findByName(name));
     }
 
     public void deleteByName(String name) {
@@ -30,11 +33,16 @@ public class GroupService {
         groupRepository.delete(group);
     }
 
-    public Group update(Group group) {
-        return groupRepository.save(group);
+    public GroupDto update(Group group) {
+        Group existingGroup = groupRepository.findById(group.getId()).orElse(null);
+        assert existingGroup != null;
+        existingGroup.setName(group.getName());
+        existingGroup.setUsers(group.getUsers());
+        existingGroup.setUpdatedAt(ZonedDateTime.now());
+        return mapToDto(groupRepository.save(existingGroup));
     }
 
-    public GroupDto mapToDto(Group groups) {
+    private GroupDto mapToDto(Group groups) {
         GroupDto groupDto = new GroupDto();
         groupDto.setId(groups.getId());
         groupDto.setName(groups.getName());
@@ -80,8 +88,8 @@ public class GroupService {
     }
 
 
-    public Group findById(Long id) {
-        return groupRepository.findById(id).orElse(null);
+    public GroupDto findById(Long id) {
+        return mapToDto(Objects.requireNonNull(groupRepository.findById(id).orElse(null)));
     }
 
 }
