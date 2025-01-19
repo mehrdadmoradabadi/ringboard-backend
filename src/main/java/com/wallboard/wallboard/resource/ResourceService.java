@@ -9,7 +9,6 @@ import java.time.ZonedDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 public class ResourceService {
@@ -57,7 +56,7 @@ public class ResourceService {
             }
             resources.sort(comparator);
         }
-        Long totalPages = (totalResources + pageSize - 1) / pageSize;
+        long totalPages = (totalResources + pageSize - 1) / pageSize;
         if(page!=0){
             List<Resource> pagedResources = resources.stream()
                     .skip((long) (page - 1) * pageSize)
@@ -67,7 +66,7 @@ public class ResourceService {
         } else {
             resourceDtosList = resources.stream().map(this::mapToDto).toList();
         }
-        return new SearchResponse<>(page, totalResources, resourceDtosList);
+        return new SearchResponse<>(page, totalPages, resourceDtosList);
     }
 
     public ResourceDto findById(Long id) {

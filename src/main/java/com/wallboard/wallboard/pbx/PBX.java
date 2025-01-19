@@ -43,16 +43,4 @@ public class PBX {
 
     @OneToMany(mappedBy = "pbx", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Resource> resources;
-
-    public PBX(String name, String host, Integer port, String protocol, String username, String password, Set<Resource> resources) {
-        this.name = name;
-        this.host = host;
-        this.port = port;
-        this.protocol = protocol;
-        this.username = username;
-        this.password = password;
-        this.resources = resources;
-
-    }
-
 }
