@@ -23,9 +23,6 @@ public class PBXService {
         return mapToDto(pbx);
     }
 
-//    public List<PBX> findAll() {
-//        return pbxRepository.findAll();
-//    }
     private PBXDto mapToDto(PBX pbx) {
         PBXDto pbxDto = new PBXDto();
         pbxDto.setId(pbx.getId());

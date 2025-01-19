@@ -1,6 +1,8 @@
 package com.wallboard.wallboard.resource;
 
+import com.wallboard.wallboard.dto.ResourceDto;
 import com.wallboard.wallboard.utils.ApiResponse;
+import com.wallboard.wallboard.utils.SearchResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -14,13 +16,13 @@ public class ResourceController {
 
     @Operation(summary = "Create a resource", description = "Create a resource")
     @PostMapping("/create")
-    public ApiResponse<Resource> create(Resource resource) {
+    public ApiResponse<ResourceDto> create(Resource resource) {
         return new ApiResponse<>(resourceService.create(resource));
     }
 
     @Operation(summary = "Update a resource", description = "Update a resource")
     @PatchMapping("/update")
-    public ApiResponse<Resource> update(Resource resource) {
+    public ApiResponse<ResourceDto> update(Resource resource) {
         return new ApiResponse<>(resourceService.update(resource));
     }
 
@@ -33,31 +35,35 @@ public class ResourceController {
 
     @Operation(summary = "Find a resource by name", description = "Find a resource by name")
     @GetMapping("/findByName")
-    public ApiResponse<Resource> findByName(String name) {
+    public ApiResponse<ResourceDto> findByName(String name) {
         return new ApiResponse<>(resourceService.findByName(name)) ;
     }
 
     @Operation(summary = "Find a resource by type", description = "Find a resource by type")
     @GetMapping("/findByType")
-    public ApiResponse<List<Resource>> findByType(String type) {
+    public ApiResponse<List<ResourceDto>> findByType(String type) {
         return new ApiResponse<>(resourceService.findByType(type));
     }
 
     @Operation(summary = "Find a resource by metadata", description = "Find a resource by metadata")
     @GetMapping("/findByMetadata")
-    public ApiResponse<List<Resource>> findByMetadata(String key, Object value) {
+    public ApiResponse<List<ResourceDto>> findByMetadata(String key, Object value) {
         return new ApiResponse<>(resourceService.findByMetadata(key, value));
     }
 
     @Operation(summary = "Find all resources", description = "Find all resources")
     @GetMapping("/findAll")
-    public ApiResponse<List<Resource>> findAll() {
-        return new ApiResponse<>(resourceService.findAll());
+    public ApiResponse<SearchResponse<List<ResourceDto>>> findAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(defaultValue = "asc" ) String order,
+            @RequestParam(required = false) String search) {
+        return new ApiResponse<>(resourceService.findAll(page, search, sortBy, order));
     }
 
     @Operation(summary = "Find a resource by id", description = "Find a resource by id")
     @GetMapping("/findById")
-    public ApiResponse<Resource> findById(Long id) {
+    public ApiResponse<ResourceDto> findById(Long id) {
         return new ApiResponse<>(resourceService.findById(id));
     }
 

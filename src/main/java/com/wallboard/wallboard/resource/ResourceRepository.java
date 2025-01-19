@@ -26,4 +26,6 @@ public interface ResourceRepository extends JpaRepository<Resource, Long> {
     List<Resource> findByType(String type);
 
     List<Resource> findByMetadata(String key, Object value);
+
+    List<Resource> findByNameContainingIgnoreCase(String search);
 }
