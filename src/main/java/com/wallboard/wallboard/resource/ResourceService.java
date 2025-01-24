@@ -20,7 +20,6 @@ public class ResourceService {
         resourceDto.setId(resource.getId());
         resourceDto.setName(resource.getName());
         resourceDto.setType(resource.getType());
-        resourceDto.setMetadata(resource.getMetadata());
         resourceDto.setUpdatedAt(resource.getUpdatedAt());
         return resourceDto;
     }
@@ -82,7 +81,6 @@ public class ResourceService {
         assert existingResource != null;
         existingResource.setName(resource.getName());
         existingResource.setType(resource.getType());
-        existingResource.setMetadata(resource.getMetadata());
         existingResource.setUpdatedAt(ZonedDateTime.now());
 
         return mapToDto(resourceRepository.save(existingResource));
@@ -97,17 +95,8 @@ public class ResourceService {
         return resources.stream().map(this::mapToDto).toList();
     }
 
-    public List<ResourceDto> findByMetadata(String key, Object value) {
-        List<Resource> resources = resourceRepository.findByMetadata(key, value);
-        return resources.stream().map(this::mapToDto).toList();
-    }
-
     public void deleteByName(String name) {
         resourceRepository.deleteByName(name);
-    }
-
-    public void deleteByPbxId(Long pbxId) {
-        resourceRepository.deleteByPbxId(pbxId);
     }
 
 }

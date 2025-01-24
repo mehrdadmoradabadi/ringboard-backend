@@ -45,12 +45,6 @@ public class ResourceController {
         return new ApiResponse<>(resourceService.findByType(type));
     }
 
-    @Operation(summary = "Find a resource by metadata", description = "Find a resource by metadata")
-    @GetMapping("/findByMetadata")
-    public ApiResponse<List<ResourceDto>> findByMetadata(String key, Object value) {
-        return new ApiResponse<>(resourceService.findByMetadata(key, value));
-    }
-
     @Operation(summary = "Find all resources", description = "Find all resources")
     @GetMapping("/findAll")
     public ApiResponse<SearchResponse<List<ResourceDto>>> findAll(
@@ -74,10 +68,4 @@ public class ResourceController {
         return new ApiResponse<>("Resource deleted successfully");
     }
 
-    @Operation(summary = "Delete a resource by pbx", description = "Delete a resource by pbx")
-    @DeleteMapping("/deleteByPbx")
-    public ApiResponse<String> deleteByPbx(Long pbxId) {
-        resourceService.deleteByPbxId(pbxId);
-        return new ApiResponse<>("Resource deleted successfully");
-    }
 }

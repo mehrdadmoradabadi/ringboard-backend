@@ -1,4 +1,4 @@
-package com.wallboard.wallboard.group;
+package com.wallboard.wallboard.ugroup;
 
 import com.wallboard.wallboard.dto.GroupDto;
 import com.wallboard.wallboard.utils.ApiResponse;
@@ -16,24 +16,24 @@ public class GroupController {
     private GroupService groupService;
 
 
-    @Operation(summary = "Save a group", description = "Save a group and return the saved group")
+    @Operation(summary = "Save a UGroup", description = "Save a UGroup and return the saved UGroup")
     @PostMapping("/save")
-    public ApiResponse<GroupDto> save(@RequestBody Group group) {
-        return new ApiResponse<>(groupService.save(group));
+    public ApiResponse<GroupDto> save(@RequestBody UGroup UGroup) {
+        return new ApiResponse<>(groupService.save(UGroup));
     }
 
-    @Operation(summary = "Delete a group", description = "Delete a group")
+    @Operation(summary = "Delete a UGroup", description = "Delete a UGroup")
     @DeleteMapping("/delete")
-    public ApiResponse<String> delete(@RequestBody Group group) {
-        groupService.delete(group);
-        return new ApiResponse<>("Group deleted successfully");
+    public ApiResponse<String> delete(@RequestBody UGroup UGroup) {
+        groupService.delete(UGroup);
+        return new ApiResponse<>("UGroup deleted successfully");
     }
 
     @Operation(summary = "Delete a group by name", description = "Delete a group by name")
     @DeleteMapping("/deleteByName")
     public ApiResponse<String> deleteByName( @RequestBody String name) {
         groupService.deleteByName(name);
-        return new ApiResponse<>("Group deleted successfully");
+        return new ApiResponse<>("UGroup deleted successfully");
     }
 
     @Operation(summary = "Find a group by name", description = "Find a group by name and return the group")
@@ -54,10 +54,10 @@ public class GroupController {
 
     }
 
-    @Operation(summary = "Update a group", description = "Update a group and return the updated group")
+    @Operation(summary = "Update a UGroup", description = "Update a UGroup and return the updated UGroup")
     @PatchMapping("/update")
-    public ApiResponse<GroupDto> update(@RequestBody Group group) {
-        return new ApiResponse<>(groupService.update(group));
+    public ApiResponse<GroupDto> update(@RequestBody UGroup UGroup) {
+        return new ApiResponse<>(groupService.update(UGroup));
     }
 
     @Operation(summary = "Find a group by id", description = "Find a group by id and return the group")

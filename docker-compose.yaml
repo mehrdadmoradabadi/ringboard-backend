@@ -1,0 +1,32 @@
+services:
+    app:
+        build: .
+        ports:
+          - "8080:8080"
+        depends_on:
+          - db
+        environment:
+          - SPRING_DATASOURCE_URL=db
+          - SPRING_DATASOURCE_DBNAME=wallboard
+          - SPRING_DATASOURCE_USERNAME=wallboard_admin
+          - SPRING_DATASOURCE_PASSWORD=123@456
+    db:
+        image: mysql:8.0
+        ports:
+          - "3306:3306"
+        volumes:
+          - wallboard-data:/var/lib/mysql
+        command: --default-authentication-plugin=mysql_native_password --bind-address=0.0.0.0
+
+        environment:
+          - MYSQL_DATABASE=wallboard
+          - MYSQL_USER=wallboard_admin
+          - MYSQL_PASSWORD=123@456
+          - MYSQL_ROOT_PASSWORD=root@456
+        healthcheck:
+          test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+          interval: 10s
+          retries: 5
+
+volumes:
+  wallboard-data:

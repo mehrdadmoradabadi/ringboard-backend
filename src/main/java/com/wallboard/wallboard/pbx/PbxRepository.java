@@ -15,5 +15,5 @@ public interface PbxRepository extends JpaRepository<PBX, Integer> {
 
     List<PBX> findByNameContainingIgnoreCaseOrHostContainingIgnoreCaseOrPortContainingIgnoreCaseOrProtocolContainingIgnoreCaseOrUsernameContainingIgnoreCase(String search, String search1, String search2, String search3, String search4);
 
-    PBX findByNameOrByHostOrById(String name);
+    PBX findByNameOrHostOrId(String name , String host, Integer id);
 }

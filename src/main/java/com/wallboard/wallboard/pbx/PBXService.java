@@ -15,15 +15,7 @@ public class PBXService {
     @Autowired
     private PbxRepository pbxRepository;
 
-    public PBXDto findByName(String name) {
-        PBX pbx = pbxRepository.findByName(name);
-        if (Objects.isNull(pbx)) {
-            return null;
-        }
-        return mapToDto(pbx);
-    }
-
-    private PBXDto mapToDto(PBX pbx) {
+    public PBXDto mapToDto(PBX pbx) {
         PBXDto pbxDto = new PBXDto();
         pbxDto.setId(pbx.getId());
         pbxDto.setName(pbx.getName());
@@ -33,6 +25,15 @@ public class PBXService {
         pbxDto.setUsername(pbx.getUsername());
         return pbxDto;
     }
+
+    public PBXDto findByName(String name) {
+        PBX pbx = pbxRepository.findByName(name);
+        if (Objects.isNull(pbx)) {
+            return null;
+        }
+        return mapToDto(pbx);
+    }
+
     public SearchResponse<List<PBXDto>> findAll(int page, String search , String sortBy, String sortDirection) {
         int pageSize = 10;
         List<PBX> pbxs;
@@ -88,7 +89,7 @@ public class PBXService {
     }
 
     public PBXDto update(PBX pbx) {
-        PBX existingPbx = pbxRepository.findByNameOrByHostOrById(pbx.getName());
+        PBX existingPbx = pbxRepository.findByNameOrHostOrId(pbx.getName(), pbx.getHost(), pbx.getId());
         assert existingPbx != null;
         existingPbx.setName(pbx.getName());
         existingPbx.setHost(pbx.getHost());
@@ -99,4 +100,5 @@ public class PBXService {
 
         return mapToDto(pbxRepository.save(existingPbx));
     }
+
 }

@@ -26,7 +26,7 @@ public class PBX {
     @Column(name = "host")
     private String host;
     @Column(name = "port")
-    private Integer port;
+    private String port;
     @Column(name = "protocol")
     private String protocol;
     @Column(name = "username")
@@ -35,10 +35,10 @@ public class PBX {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "created_at", columnDefinition = "TIMESTAMP WITH TIME ZONE")
+    @Column(name = "created_at")
     private ZonedDateTime createdAt = ZonedDateTime.now();
 
-    @Column(name = "updated_at", columnDefinition = "TIMESTAMP WITH TIME ZONE")
+    @Column(name = "updated_at")
     private ZonedDateTime updatedAt = ZonedDateTime.now();
 
     @OneToMany(mappedBy = "pbx", cascade = CascadeType.ALL, orphanRemoval = true)

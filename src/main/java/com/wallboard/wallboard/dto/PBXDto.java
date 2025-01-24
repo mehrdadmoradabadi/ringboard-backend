@@ -9,7 +9,7 @@ public class PBXDto {
     private Integer id;
     private String name;
     private String host;
-    private Integer port;
+    private String port;
     private String protocol;
     private String username;
 }
