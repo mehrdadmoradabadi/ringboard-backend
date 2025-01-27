@@ -1,18 +1,13 @@
 package com.wallboard.wallboard.pbx;
 
 import com.wallboard.wallboard.dto.PBXDto;
-import com.wallboard.wallboard.pbx.adapters.Issabel;
-import com.wallboard.wallboard.pbx.adapters.IssabelService;
-import com.wallboard.wallboard.pbx.adapters.PbxUpdaterService;
 import com.wallboard.wallboard.utils.ApiResponse;
 import com.wallboard.wallboard.utils.SearchResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -20,8 +15,6 @@ import java.util.List;
 public class PBXController {
     @Autowired
     private PBXService pbxService;
-    @Autowired
-    private IssabelService issabelService;
 
 
     @Operation(summary = "Find all pbx", description = "Find all pbx and return the list of pbx")
@@ -66,19 +59,8 @@ public class PBXController {
         return new ApiResponse<>( pbxService.update(pbx));
     }
 
-    @Autowired
-    private PbxUpdaterService pbxUpdaterService;
-    @Operation(summary = "Stream updates from a PBX", description = "Stream updates from a PBX")
-    @GetMapping(path = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Issabel streamPBXUpdates(@RequestBody HashMap<String, String> data) {
-        return pbxUpdaterService.getIssabelInstance(data.get("pbxId"), data.get("host"), data.get("username"), data.get("password"));
-    }
-//    @Operation(summary = "Stream updates from a PBX", description = "Stream updates from a PBX")
-//    @GetMapping(path = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-//    public Flux<String> streamPBXUpdates(@RequestBody HashMap<String, String> data) {
-//        return issabelService.streamUpdates(data.get("pbxId"), data.get("host"), data.get("username"), data.get("password"), data.get("interval"));
-//    }
 
+//This is for test. TODO remove later
     @GetMapping("/threads")
     public List<String> listActiveThreads() {
 
@@ -86,4 +68,6 @@ public class PBXController {
         Thread.getAllStackTraces().keySet().forEach(thread -> threadNames.add(thread.getName()));
         return threadNames;
     }
+
+
 }

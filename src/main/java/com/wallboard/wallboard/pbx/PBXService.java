@@ -101,4 +101,7 @@ public class PBXService {
         return mapToDto(pbxRepository.save(existingPbx));
     }
 
+    public PBX findById(String pbxId) {
+        return pbxRepository.findById(Integer.parseInt(pbxId)).orElse(null);
+    }
 }

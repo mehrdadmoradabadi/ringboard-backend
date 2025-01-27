@@ -21,15 +21,15 @@ public class PBX {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
-    @Column(name = "host")
+    @Column(name = "host", nullable = false)
     private String host;
     @Column(name = "port")
     private String port;
     @Column(name = "protocol")
     private String protocol;
-    @Column(name = "username")
+    @Column(name = "username", nullable = false)
     private String username;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "password")
@@ -43,4 +43,10 @@ public class PBX {
 
     @OneToMany(mappedBy = "pbx", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Resource> resources;
+
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive = true;
+
+    @Column(name = "app_name", nullable = false)
+    private String appName;
 }

@@ -33,12 +33,18 @@
 		<dependency>
 			<groupId>org.asteriskjava</groupId>
 			<artifactId>asterisk-java</artifactId>
-			<version>3.6.0</version>
+			<version>3.41.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-websocket</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>io.github.ari4java</groupId>
+			<artifactId>ari4java</artifactId>
+			<version>0.17.0</version>
+		</dependency>
+
 		<dependency>
 			<groupId>io.projectreactor</groupId>
 			<artifactId>reactor-core</artifactId>

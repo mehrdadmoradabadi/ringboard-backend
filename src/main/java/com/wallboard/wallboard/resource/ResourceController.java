@@ -1,11 +1,19 @@
 package com.wallboard.wallboard.resource;
 
+import ch.loway.oss.ari4java.tools.RestException;
 import com.wallboard.wallboard.dto.ResourceDto;
+import com.wallboard.wallboard.resource.adapters.*;
 import com.wallboard.wallboard.utils.ApiResponse;
 import com.wallboard.wallboard.utils.SearchResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -13,6 +21,8 @@ import java.util.List;
 public class ResourceController {
     @Autowired
     private ResourceService resourceService;
+    @Autowired
+    private AriService asteriskService;
 
     @Operation(summary = "Create a resource", description = "Create a resource")
     @PostMapping("/create")
@@ -68,4 +78,45 @@ public class ResourceController {
         return new ApiResponse<>("Resource deleted successfully");
     }
 
+
+
+
+
+    @GetMapping("/queues")
+    public ResponseEntity<List<QueueInfo>> getQueues(@RequestParam String pbxID) {
+        return ResponseEntity.ok(asteriskService.getQueues(pbxID));
+    }
+
+    @GetMapping("/agents")
+    public ResponseEntity<List<AgentInfo>> getAgents() {
+        try {
+            return ResponseEntity.ok(asteriskService.getAgents());
+        } catch (RestException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/extensions")
+    public ResponseEntity<List<ExtensionInfo>> getExtensions() {
+        try {
+            return ResponseEntity.ok(asteriskService.getExtensions());
+        } catch (RestException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/trunks")
+    public ResponseEntity<List<TrunkInfo>> getTrunks() {
+        try {
+            return ResponseEntity.ok(asteriskService.getTrunks());
+        } catch (RestException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @Operation(summary = "Stream updates from a PBX", description = "Stream updates from a PBX")
+    @GetMapping(path = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<String> streamPBXUpdates(@RequestBody HashMap<String, String> data) {
+        return asteriskService.streamUpdates(data.get("pbxId"), data.get("interval"));
+    }
 }
