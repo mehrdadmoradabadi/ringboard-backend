@@ -8,6 +8,7 @@ import ch.loway.oss.ari4java.tools.ARIException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wallboard.wallboard.pbx.PBX;
 import com.wallboard.wallboard.pbx.PBXService;
+import com.wallboard.wallboard.utils.ResourceNotFoundException;
 import org.asteriskjava.live.AsteriskQueue;
 import org.asteriskjava.live.DefaultAsteriskServer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ public class AriService {
         try {
             PBX pbx = pbxService.findById(pbxId);
             if (pbx == null) {
-                throw new RuntimeException("PBX not found with ID: " + pbxId);
+                throw new ResourceNotFoundException( "PBX not found with ID: " + pbxId);
             }
             DefaultAsteriskServer asteriskServer = getServerConnection(pbxId, pbx.getHost(),
                     pbx.getUsername(), pbx.getPassword());
@@ -54,7 +55,7 @@ public class AriService {
     public List<AgentInfo> getAgents(String pbxId) throws ARIException {
         PBX pbx = pbxService.findById(pbxId);
         if (pbx == null) {
-            throw new RuntimeException("PBX not found with ID: " + pbxId);
+            throw new ResourceNotFoundException("PBX not found with ID: " + pbxId);
         }
         String Host = "http://" + pbx.getHost()+":"+pbx.getPort();
         ARI ari = ARI.build(Host, pbx.getAppName(), pbx.getUsername(), pbx.getPassword(), AriVersion.IM_FEELING_LUCKY);
@@ -79,7 +80,7 @@ public class AriService {
     public List<ExtensionInfo> getExtensions(String pbxId) throws ARIException, RuntimeException {
         PBX pbx = pbxService.findById(pbxId);
         if (pbx == null) {
-            throw new RuntimeException("PBX not found with ID: " + pbxId);
+            throw new ResourceNotFoundException("PBX not found with ID: " + pbxId);
         }
         String Host = "http://" + pbx.getHost()+":"+pbx.getPort();
         ARI ari = ARI.build(Host, pbx.getAppName(), pbx.getUsername(), pbx.getPassword(), AriVersion.IM_FEELING_LUCKY);
@@ -103,7 +104,7 @@ public class AriService {
     public List<TrunkInfo> getTrunks(String pbxId) throws ARIException {
         PBX pbx = pbxService.findById(pbxId);
         if (pbx == null) {
-            throw new RuntimeException("PBX not found with ID: " + pbxId);
+            throw new ResourceNotFoundException( "PBX not found with ID: " + pbxId);
         }
         String Host = "http://" + pbx.getHost()+":"+pbx.getPort();
         ARI ari = ARI.build(Host, pbx.getAppName(), pbx.getUsername(), pbx.getPassword(), AriVersion.IM_FEELING_LUCKY);

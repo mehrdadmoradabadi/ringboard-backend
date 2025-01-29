@@ -1,6 +1,7 @@
 package com.wallboard.wallboard.resource;
 
 import com.wallboard.wallboard.dto.ResourceDto;
+import com.wallboard.wallboard.utils.ResourceNotFoundException;
 import com.wallboard.wallboard.utils.SearchResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,9 +28,6 @@ public class ResourceService {
         return mapToDto(resourceRepository.save(resource));
     }
 
-//    public List<Resource> findAll() {
-//        return resourceRepository.findAll();
-//    }
     public SearchResponse<List<ResourceDto>> findAll(int page, String search , String sortBy, String sortDirection) {
         int pageSize = 10;
         List<Resource> resources;
@@ -77,7 +75,7 @@ public class ResourceService {
     }
 
     public ResourceDto update(Resource resource) {
-        Resource existingResource = resourceRepository.findById(resource.getId()).orElse(null);
+        Resource existingResource = resourceRepository.findById(resource.getId()).orElseThrow(() -> new ResourceNotFoundException("Resource not found with ID: " + resource.getId()));
         assert existingResource != null;
         existingResource.setName(resource.getName());
         existingResource.setType(resource.getType());
@@ -87,15 +85,26 @@ public class ResourceService {
     }
 
     public ResourceDto findByName(String name) {
-        return mapToDto(resourceRepository.findByName(name));
+        Resource resource = resourceRepository.findByName(name);
+        if (resource == null) {
+            throw new ResourceNotFoundException("Resource not found with name: " + name);
+        }
+        return mapToDto(resource);
     }
 
     public List<ResourceDto> findByType(String type) {
         List<Resource> resources = resourceRepository.findByType(type);
+        if (resources.isEmpty()) {
+            throw new ResourceNotFoundException("No resources found with type: " + type);
+        }
         return resources.stream().map(this::mapToDto).toList();
     }
 
     public void deleteByName(String name) {
+        Resource resource = resourceRepository.findByName(name);
+        if (resource == null) {
+            throw new ResourceNotFoundException("Resource not found with name: " + name);
+        }
         resourceRepository.deleteByName(name);
     }
 

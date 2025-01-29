@@ -1,6 +1,7 @@
 package com.wallboard.wallboard.pbx;
 
 import com.wallboard.wallboard.dto.PBXDto;
+import com.wallboard.wallboard.utils.ResourceNotFoundException;
 import com.wallboard.wallboard.utils.SearchResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,7 @@ public class PBXService {
     public PBXDto findByName(String name) {
         PBX pbx = pbxRepository.findByName(name);
         if (Objects.isNull(pbx)) {
-            return null;
+            throw new ResourceNotFoundException("PBX not found with name: " + name);
         }
         return mapToDto(pbx);
     }
@@ -81,16 +82,26 @@ public class PBXService {
     }
 
     public void delete(PBX pbx) {
+        PBX existingPbx = pbxRepository.findByNameOrHostOrId(pbx.getName(), pbx.getHost(), pbx.getId());
+        if (existingPbx == null) {
+            throw new ResourceNotFoundException("PBX not found with name: " + pbx.getName());
+        }
         pbxRepository.delete(pbx);
     }
 
     public void deleteByName(String name) {
+        PBX existingPbx = pbxRepository.findByName(name);
+        if (existingPbx == null) {
+            throw new ResourceNotFoundException("PBX not found with name: " + name);
+        }
         pbxRepository.deleteByName(name);
     }
 
     public PBXDto update(PBX pbx) {
         PBX existingPbx = pbxRepository.findByNameOrHostOrId(pbx.getName(), pbx.getHost(), pbx.getId());
-        assert existingPbx != null;
+        if (existingPbx == null) {
+            throw new ResourceNotFoundException("PBX not found with name: " + pbx.getName());
+        }
         existingPbx.setName(pbx.getName());
         existingPbx.setHost(pbx.getHost());
         existingPbx.setPort(pbx.getPort());
@@ -102,6 +113,6 @@ public class PBXService {
     }
 
     public PBX findById(String pbxId) {
-        return pbxRepository.findById(Integer.parseInt(pbxId)).orElse(null);
+        return pbxRepository.findById(Integer.parseInt(pbxId)).orElseThrow(() -> new ResourceNotFoundException("PBX not found with ID: " + pbxId));
     }
 }
