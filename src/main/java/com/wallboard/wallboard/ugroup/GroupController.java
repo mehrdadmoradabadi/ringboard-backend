@@ -5,6 +5,8 @@ import com.wallboard.wallboard.utils.ApiResponse;
 import com.wallboard.wallboard.utils.SearchResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,51 +20,86 @@ public class GroupController {
 
     @Operation(summary = "Save a UGroup", description = "Save a UGroup and return the saved UGroup")
     @PostMapping("/save")
-    public ApiResponse<GroupDto> save(@RequestBody UGroup UGroup) {
-        return new ApiResponse<>(groupService.save(UGroup));
+    public ResponseEntity<ApiResponse<GroupDto>> save(@RequestBody UGroup UGroup) {
+        try {
+            return ResponseEntity.ok(ApiResponse.success(groupService.save(UGroup)));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.badRequest(e.getMessage()));
+        }
     }
 
     @Operation(summary = "Delete a UGroup", description = "Delete a UGroup")
     @DeleteMapping("/delete")
-    public ApiResponse<String> delete(@RequestBody UGroup UGroup) {
-        groupService.delete(UGroup);
-        return new ApiResponse<>("UGroup deleted successfully");
+    public ResponseEntity<ApiResponse<String>> delete(@RequestBody UGroup UGroup) {
+        try {
+            groupService.delete(UGroup);
+            return ResponseEntity.ok(ApiResponse.success("UGroup deleted successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.badRequest(e.getMessage()));
+    }
     }
 
     @Operation(summary = "Delete a group by name", description = "Delete a group by name")
     @DeleteMapping("/deleteByName")
-    public ApiResponse<String> deleteByName( @RequestBody String name) {
-        groupService.deleteByName(name);
-        return new ApiResponse<>("UGroup deleted successfully");
+    public ResponseEntity<ApiResponse<String>> deleteByName( @RequestBody String name) {
+        try {
+            groupService.deleteByName(name);
+            return ResponseEntity.ok(ApiResponse.success("UGroup deleted successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.badRequest(e.getMessage()));
+        }
     }
 
     @Operation(summary = "Find a group by name", description = "Find a group by name and return the group")
     @GetMapping("/findByName")
-    public ApiResponse<GroupDto> findByName(@PathVariable String name) {
-        return new ApiResponse<>(groupService.findByName(name));
+    public ResponseEntity<ApiResponse<GroupDto>> findByName(@PathVariable String name) {
+        try {
+            return ResponseEntity.ok(ApiResponse.success(groupService.findByName(name)));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.badRequest(e.getMessage()));
+        }
     }
 
     @Operation(summary = "Find all groups", description = "Find all groups and return the list of groups")
     @GetMapping("/all")
-    public ApiResponse<SearchResponse<List<GroupDto>>> findAll(
+    public ResponseEntity<ApiResponse<SearchResponse<List<GroupDto>>>> findAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(required = false) String sortBy,
             @RequestParam(defaultValue = "asc" ) String order,
             @RequestParam(required = false) String search) {
 
-        return new ApiResponse<>(groupService.findAll(page, search, sortBy, order));
+        try {
+            return ResponseEntity.ok(ApiResponse.success(groupService.findAll(page, search, sortBy, order)));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.badRequest(e.getMessage()));
+        }
 
     }
 
     @Operation(summary = "Update a UGroup", description = "Update a UGroup and return the updated UGroup")
     @PatchMapping("/update")
-    public ApiResponse<GroupDto> update(@RequestBody UGroup UGroup) {
-        return new ApiResponse<>(groupService.update(UGroup));
+    public ResponseEntity<ApiResponse<GroupDto>> update(@RequestBody UGroup UGroup) {
+        try {
+            return ResponseEntity.ok(ApiResponse.success(groupService.update(UGroup)));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.badRequest(e.getMessage()));
+        }
     }
 
     @Operation(summary = "Find a group by id", description = "Find a group by id and return the group")
     @GetMapping("/findById")
-    public GroupDto findById(@PathVariable Long id) {
-        return groupService.findById(id);
+    public ResponseEntity<ApiResponse<GroupDto>> findById(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(ApiResponse.success(groupService.findById(id)));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.badRequest(e.getMessage()));
+        }
     }
 }
