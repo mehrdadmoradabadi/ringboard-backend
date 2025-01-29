@@ -4,7 +4,7 @@ import ch.loway.oss.ari4java.ARI;
 import ch.loway.oss.ari4java.AriVersion;
 import ch.loway.oss.ari4java.generated.models.Channel;
 import ch.loway.oss.ari4java.generated.models.Endpoint;
-import ch.loway.oss.ari4java.tools.RestException;
+import ch.loway.oss.ari4java.tools.ARIException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wallboard.wallboard.pbx.PBX;
 import com.wallboard.wallboard.pbx.PBXService;
@@ -23,28 +23,17 @@ import java.util.concurrent.ConcurrentMap;
 public class AriService {
     @Autowired
     private PBXService pbxService;
-    private final ARI ari;
-    private final PBX pbx;
     private final ConcurrentMap<String, Thread> pbxThreads = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, DefaultAsteriskServer> serverConnections = new ConcurrentHashMap<>();
     private final ObjectMapper objectMapper = new ObjectMapper();
-
-    public AriService( String pbxId) throws Exception {
-        this.pbx = pbxService.findById(pbxId);
-        if (pbx == null) {
-            throw new RuntimeException("PBX not found with ID: " + pbxId);
-        }
-        this.ari = ARI.build(pbx.getHost(), pbx.getAppName(), pbx.getUsername(), pbx.getPassword(), AriVersion.IM_FEELING_LUCKY);
-    }
-
     public List<QueueInfo> getQueues(String pbxId) {
         try {
-            if (this.pbx == null) {
+            PBX pbx = pbxService.findById(pbxId);
+            if (pbx == null) {
                 throw new RuntimeException("PBX not found with ID: " + pbxId);
             }
-
-            DefaultAsteriskServer asteriskServer = getServerConnection(pbxId, this.pbx.getHost(),
-                    this.pbx.getUsername(), this.pbx.getPassword());
+            DefaultAsteriskServer asteriskServer = getServerConnection(pbxId, pbx.getHost(),
+                    pbx.getUsername(), pbx.getPassword());
 
             List<QueueInfo> queues = new ArrayList<>();
             for (AsteriskQueue queue : asteriskServer.getQueues()) {
@@ -62,7 +51,13 @@ public class AriService {
         }
     }
 
-    public List<AgentInfo> getAgents() throws RestException {
+    public List<AgentInfo> getAgents(String pbxId) throws ARIException {
+        PBX pbx = pbxService.findById(pbxId);
+        if (pbx == null) {
+            throw new RuntimeException("PBX not found with ID: " + pbxId);
+        }
+        String Host = "http://" + pbx.getHost()+":"+pbx.getPort();
+        ARI ari = ARI.build(Host, pbx.getAppName(), pbx.getUsername(), pbx.getPassword(), AriVersion.IM_FEELING_LUCKY);
         List<AgentInfo> agentInfo = new ArrayList<>();
         for (Channel channel : ari.channels().list().execute()) {
             if (isAgentChannel(channel)) {
@@ -81,7 +76,13 @@ public class AriService {
                 channel.getCaller().getName().startsWith("Agent/");
     }
 
-    public List<ExtensionInfo> getExtensions() throws RestException {
+    public List<ExtensionInfo> getExtensions(String pbxId) throws ARIException, RuntimeException {
+        PBX pbx = pbxService.findById(pbxId);
+        if (pbx == null) {
+            throw new RuntimeException("PBX not found with ID: " + pbxId);
+        }
+        String Host = "http://" + pbx.getHost()+":"+pbx.getPort();
+        ARI ari = ARI.build(Host, pbx.getAppName(), pbx.getUsername(), pbx.getPassword(), AriVersion.IM_FEELING_LUCKY);
         List<ExtensionInfo> extensionInfos = new ArrayList<>();
         for (Endpoint endpoint : ari.endpoints().list().execute()) {
             if (isSIPEndpoint(endpoint)) {
@@ -99,7 +100,13 @@ public class AriService {
                 "PJSIP".equals(endpoint.getTechnology());
     }
 
-    public List<TrunkInfo> getTrunks() throws RestException {
+    public List<TrunkInfo> getTrunks(String pbxId) throws ARIException {
+        PBX pbx = pbxService.findById(pbxId);
+        if (pbx == null) {
+            throw new RuntimeException("PBX not found with ID: " + pbxId);
+        }
+        String Host = "http://" + pbx.getHost()+":"+pbx.getPort();
+        ARI ari = ARI.build(Host, pbx.getAppName(), pbx.getUsername(), pbx.getPassword(), AriVersion.IM_FEELING_LUCKY);
         List<TrunkInfo> trunkInfo = new ArrayList<>();
         for (Endpoint endpoint : ari.endpoints().list().execute()) {
             if (isTrunkEndpoint(endpoint)) {
