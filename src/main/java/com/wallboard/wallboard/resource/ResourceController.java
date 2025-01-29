@@ -1,6 +1,5 @@
 package com.wallboard.wallboard.resource;
 
-import ch.loway.oss.ari4java.tools.ARIException;
 import ch.loway.oss.ari4java.tools.RestException;
 import com.wallboard.wallboard.dto.ResourceDto;
 import com.wallboard.wallboard.resource.adapters.*;
@@ -8,6 +7,7 @@ import com.wallboard.wallboard.utils.ApiResponse;
 import com.wallboard.wallboard.utils.SearchResponse;
 import com.wallboard.wallboard.utils.IDNormalizer;
 import io.swagger.v3.oas.annotations.Operation;
+import org.hibernate.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -43,10 +43,15 @@ public class ResourceController {
     public ResponseEntity<ApiResponse<ResourceDto>> update(Resource resource) {
         try {
         return ResponseEntity.ok(ApiResponse.success(resourceService.update(resource)));
-        } catch (Exception e) {
+        } catch (ObjectNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.notFound(e.getMessage()));
+        }
+        catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(ApiResponse.badRequest(e.getMessage()));
         }
+
     }
 
     @Operation(summary = "Delete a resource", description = "Delete a resource")
@@ -56,7 +61,11 @@ public class ResourceController {
         id = IDNormalizer.normalize(id);
             resourceService.delete(Long.valueOf(id));
         return ResponseEntity.ok(ApiResponse.success("Resource deleted successfully"));
-        } catch (Exception e) {
+        }catch (ObjectNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.notFound(e.getMessage()));
+        }
+        catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(ApiResponse.badRequest(e.getMessage()));
         }
@@ -67,7 +76,11 @@ public class ResourceController {
     public ResponseEntity<ApiResponse<ResourceDto>> findByName(String name) {
         try {
             return ResponseEntity.ok(ApiResponse.success(resourceService.findByName(name)));
-        } catch (Exception e) {
+        }catch (ObjectNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.notFound(e.getMessage()));
+        }
+        catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(ApiResponse.badRequest(e.getMessage()));
         }
@@ -78,7 +91,11 @@ public class ResourceController {
     public ResponseEntity<ApiResponse<List<ResourceDto>>> findByType(String type) {
         try {
         return ResponseEntity.ok(ApiResponse.success(resourceService.findByType(type)));
-        } catch (Exception e) {
+        }catch (ObjectNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.notFound(e.getMessage()));
+        }
+        catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(ApiResponse.badRequest(e.getMessage()));
         }
@@ -105,7 +122,10 @@ public class ResourceController {
         try {
             id = IDNormalizer.normalize(id);
             return ResponseEntity.ok(ApiResponse.success(resourceService.findById(Long.valueOf(id))));
-        } catch (Exception e) {
+        }catch (ObjectNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.notFound(e.getMessage()));
+        }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(ApiResponse.badRequest(e.getMessage()));
         }
@@ -117,7 +137,10 @@ public class ResourceController {
         try {
         resourceService.deleteByName(name);
         return ResponseEntity.ok(ApiResponse.success("Resource deleted successfully"));
-        } catch (Exception e) {
+        } catch (ObjectNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.notFound(e.getMessage()));
+        }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(ApiResponse.internalError(e.getMessage()));
         }
@@ -130,7 +153,10 @@ public class ResourceController {
         try {
         pbxID = IDNormalizer.normalize(pbxID);
             return ResponseEntity.ok(ApiResponse.success(asteriskService.getQueues(pbxID)));
-        } catch (Exception e) {
+        } catch (ObjectNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.notFound(e.getMessage()));
+        }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(ApiResponse.badRequest(e.getMessage()));
         }
@@ -143,7 +169,10 @@ public class ResourceController {
             return ResponseEntity.ok(ApiResponse.success(asteriskService.getAgents(pbxID)));
         } catch (RestException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.internalError(e.getMessage()));
-        } catch (Exception e) {
+        } catch (ObjectNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.notFound(e.getMessage()));
+        }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(ApiResponse.badRequest(e.getMessage()));
         }
@@ -157,7 +186,10 @@ public class ResourceController {
         } catch (RestException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.internalError(e.getMessage()));
-        } catch (Exception e) {
+        } catch (ObjectNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.notFound(e.getMessage()));
+        }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(ApiResponse.badRequest(e.getMessage()));
         }
@@ -171,7 +203,10 @@ public class ResourceController {
         } catch (RestException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.internalError(e.getMessage()));
-        } catch (Exception e) {
+        } catch (ObjectNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.notFound(e.getMessage()));
+        }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(ApiResponse.badRequest(e.getMessage()));
         }

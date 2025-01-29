@@ -17,17 +17,12 @@ public class UserController {
 
     @GetMapping("/all")
     public ResponseEntity<ApiResponse<List<User>>> getAllUsers() {
-        try {
-            List<User> Users = userService.getAllUsers();
-            return ResponseEntity.ok(ApiResponse.success(userService.getAllUsers()));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(ApiResponse.badRequest(e.getMessage()));
-        }
+        return ResponseEntity.ok(ApiResponse.success(userService.getAllUsers()));
+
     }
 
     @GetMapping("/save")
     public ResponseEntity<ApiResponse<String>> saveUser() {
-        try {
         User User = new User();
         User.setUsername("test2");
         User.setEmail("test2");
@@ -35,8 +30,5 @@ public class UserController {
         User.setHashedPassword("test22");
         userService.saveUser(User);
         return ResponseEntity.ok(ApiResponse.success("Done"));
-    } catch (Exception e) {
-        return ResponseEntity.badRequest().body(ApiResponse.badRequest(e.getMessage()));
-    }
     }
 }

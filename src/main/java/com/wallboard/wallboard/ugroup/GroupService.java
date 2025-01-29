@@ -1,15 +1,15 @@
 package com.wallboard.wallboard.ugroup;
 
 import com.wallboard.wallboard.dto.GroupDto;
+import com.wallboard.wallboard.user.User;
+import com.wallboard.wallboard.utils.ResourceNotFoundException;
 import com.wallboard.wallboard.utils.SearchResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.wallboard.wallboard.user.User;
 
 import java.time.ZonedDateTime;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,22 +21,35 @@ public class GroupService {
     }
 
     public GroupDto findByName(String name) {
+        UGroup group = groupRepository.findByName(name);
+
+        if (group == null) {
+            throw new ResourceNotFoundException("Group not found with name: " + name);
+        }
         return mapToDto(groupRepository.findByName(name));
     }
 
     public void deleteByName(String name) {
+        UGroup group = groupRepository.findByName(name);
+
+        if (group == null) {
+            throw new ResourceNotFoundException("Group not found with name: " + name);
+        }
         groupRepository.deleteByName(name);
     }
 
     public void delete(UGroup UGroup) {
+        UGroup group = groupRepository.findByName(UGroup.getName());
+
+        if (group == null) {
+            throw new ResourceNotFoundException("Group not found with name: " + UGroup);
+        }
         groupRepository.delete(UGroup);
     }
 
     public GroupDto update(UGroup UGroup) {
-        UGroup existingUGroup = groupRepository.findById(UGroup.getId()).orElse(null);
-        assert existingUGroup != null;
+        UGroup existingUGroup = groupRepository.findById(UGroup.getId()).orElseThrow(() -> new ResourceNotFoundException("Group not found with ID: " + UGroup.getId()));
         existingUGroup.setName(UGroup.getName());
-//        existingUGroup.setUsers(UGroup.getUsers());
         existingUGroup.setUpdatedAt(ZonedDateTime.now());
         return mapToDto(groupRepository.save(existingUGroup));
     }
@@ -88,7 +101,9 @@ public class GroupService {
 
 
     public GroupDto findById(Long id) {
-        return mapToDto(Objects.requireNonNull(groupRepository.findById(id).orElse(null)));
+        return groupRepository.findById(id)
+                .map(this::mapToDto)
+                .orElseThrow(() -> new ResourceNotFoundException("Group not found with ID: " + id));
     }
 
 }
