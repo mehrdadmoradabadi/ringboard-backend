@@ -1,29 +1,35 @@
 package com.wallboard.wallboard.utils;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class ApiResponse<T> {
-    private String ResponseCode;
-    private String message;
-    private T result;
+    private String responseCode; // Custom response codes like "200", "400", etc.
+    private String message;      // Response message
+    private T result;            // Actual payload (data)
 
-    public ApiResponse(String responseCode, String message, T result) {
-        this.ResponseCode = responseCode;
-        this.message = message;
-        this.result = result;
-    }
-    public ApiResponse(T result) {
-        ResponseCode = "200";
-        this.message = "Successful";
-        this.result = result;
+    public static <T> ApiResponse<T> success(T result) {
+        return new ApiResponse<>(ApiResponseCode.SUCCESS, "Successful", result);
     }
 
-    public ApiResponse(String responseCode, String message) {
-        this.ResponseCode = responseCode;
-        this.message = message;
+    public static <T> ApiResponse<T> success(T result, String message) {
+        return new ApiResponse<>(ApiResponseCode.SUCCESS, message, result);
+    }
+
+      public static <T> ApiResponse<T> notFound(String message) {
+        return new ApiResponse<>(ApiResponseCode.NOT_FOUND, message, null);
+    }
+
+    public static <T> ApiResponse<T> badRequest(String message) {
+        return new ApiResponse<>(ApiResponseCode.BAD_REQUEST, message, null);
+    }
+    public static <T> ApiResponse<T> internalError(String message) {
+        return new ApiResponse<>(ApiResponseCode.SERVER_ERROR, message, null);
     }
 }
 
