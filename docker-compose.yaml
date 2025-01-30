@@ -2,9 +2,10 @@ services:
   app:
     build: .
     ports:
-      - "8080:8080"
+      - 8080:8080
     depends_on:
-      - db
+        db:
+            condition: service_healthy
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/ringboard
       - SPRING_DATASOURCE_DBNAME=ringboard
@@ -25,7 +26,7 @@ services:
       - MYSQL_PASSWORD=123@456
       - MYSQL_ROOT_PASSWORD=root@456
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "rb_admin", "--password=123@456"]
       interval: 10s
       retries: 5
     networks:
