@@ -15,7 +15,13 @@ Ringboard Backend is a Java-based application designed to provide monitoring cap
 ## Requirements
 
 - Java Development Kit (JDK)
-- Any dependencies required by the project (list them here)
+- Docker
+- Maven
+- Spring Boot
+- MySQL
+- Swagger
+- Mysql
+- Lombok
 
 ## Installation
 
