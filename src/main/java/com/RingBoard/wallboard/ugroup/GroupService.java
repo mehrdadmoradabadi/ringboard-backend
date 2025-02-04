@@ -1,36 +1,64 @@
 package com.RingBoard.wallboard.ugroup;
 
-import com.RingBoard.wallboard.dto.GroupDto;
+import com.RingBoard.wallboard.ugroup.dto.GroupDto;
 import com.RingBoard.wallboard.user.User;
+import com.RingBoard.wallboard.user.UserService;
 import com.RingBoard.wallboard.utils.ResourceNotFoundException;
 import com.RingBoard.wallboard.utils.SearchResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class GroupService {
     @Autowired
     private GroupRepository groupRepository;
-    public GroupDto save(UGroup UGroup) {
-        return mapToDto(groupRepository.save(UGroup));
+    @Autowired
+    private UserService userService;
+    private GroupDto.GroupResponse mapToResponse(Group groups) {
+        GroupDto.GroupResponse groupDto = new GroupDto.GroupResponse();
+
+        groupDto.setId(groups.getId());
+        groupDto.setName(groups.getName());
+        groupDto.setUsers(groups.getUsers().stream().map(User::getUsername).collect(Collectors.toSet()));
+        return groupDto;
+    }
+    private Group mapToEntity(GroupDto.CreateGroupResponse request) {
+        Set<User> users = request.getUsers().stream().map(userId -> userService.findById(Integer.parseInt(userId))).collect(Collectors.toSet());
+        Group group = new Group();
+        group.setName(request.getName());
+        group.setUsers(users);
+
+        return group;
+    }
+    @Transactional
+    public GroupDto.GroupResponse save(GroupDto.CreateGroupResponse groupRequest) {
+        Group group = mapToEntity(groupRequest);
+        group.setCreatedAt(ZonedDateTime.now());
+        group.setUpdatedAt(ZonedDateTime.now());
+        group.setUsers(group.getUsers());
+        group.setName(groupRequest.getName());
+        return mapToResponse(groupRepository.save(group));
     }
 
-    public GroupDto findByName(String name) {
-        UGroup group = groupRepository.findByName(name);
+    public GroupDto.GroupResponse findByName(String name) {
+        Group group = groupRepository.findByName(name);
 
         if (group == null) {
             throw new ResourceNotFoundException("Group not found with name: " + name);
         }
-        return mapToDto(groupRepository.findByName(name));
+        return mapToResponse(groupRepository.findByName(name));
     }
 
+    @Transactional
     public void deleteByName(String name) {
-        UGroup group = groupRepository.findByName(name);
+        Group group = groupRepository.findByName(name);
 
         if (group == null) {
             throw new ResourceNotFoundException("Group not found with name: " + name);
@@ -38,71 +66,68 @@ public class GroupService {
         groupRepository.deleteByName(name);
     }
 
-    public void delete(UGroup UGroup) {
-        UGroup group = groupRepository.findByName(UGroup.getName());
+    @Transactional
+    public void delete(Group Group) {
+        Group group = groupRepository.findByName(Group.getName());
 
         if (group == null) {
-            throw new ResourceNotFoundException("Group not found with name: " + UGroup);
+            throw new ResourceNotFoundException("Group not found with name: " + Group);
         }
-        groupRepository.delete(UGroup);
+        groupRepository.delete(Group);
     }
 
-    public GroupDto update(UGroup UGroup) {
-        UGroup existingUGroup = groupRepository.findById(UGroup.getId()).orElseThrow(() -> new ResourceNotFoundException("Group not found with ID: " + UGroup.getId()));
-        existingUGroup.setName(UGroup.getName());
-        existingUGroup.setUpdatedAt(ZonedDateTime.now());
-        return mapToDto(groupRepository.save(existingUGroup));
+    public GroupDto.GroupResponse update(GroupDto.UpdateGroupResponse group) {
+        Group existingGroup = groupRepository.findById(group.getId()).orElseThrow(() -> new ResourceNotFoundException("Group not found with ID: " + group.getId()));
+        Set<User> users = group.getUsers().stream().map(userId -> userService.findById(Integer.parseInt(userId))).collect(Collectors.toSet());
+        if (group.getName() != null) existingGroup.setName(group.getName());
+        if (group.getUsers() != null) existingGroup.setUsers(users);
+        existingGroup.setUpdatedAt(ZonedDateTime.now());
+        return mapToResponse(groupRepository.save(existingGroup));
     }
 
-    private GroupDto mapToDto(UGroup groups) {
-        GroupDto groupDto = new GroupDto();
-        groupDto.setId(groups.getId());
-        groupDto.setName(groups.getName());
-        groupDto.setUsers(groups.getUsers().stream().map(User::getUsername).toList());
-        return groupDto;
-    }
-    public SearchResponse<List<GroupDto>> findAll(int page,String search ,String sortBy,String sortDirection) {
+
+    public SearchResponse<List<GroupDto.GroupResponse>> findAll(int page,String search ,String sortBy,String sortDirection) {
         int pageSize =10;
-        List<UGroup> UGroups;
-        List<GroupDto> groupDtosList;
+        List<Group> Groups;
+        List<GroupDto.GroupResponse> groupDtosList;
         long totalGroups;
         if (search != null && !search.isEmpty()) {
-            UGroups = groupRepository.findByNameContainingIgnoreCase(search);
-            totalGroups= UGroups.size();
+            Groups = groupRepository.findByNameContainingIgnoreCase(search);
+            totalGroups= Groups.size();
         } else {
-            UGroups = groupRepository.findAll();
+            Groups = groupRepository.findAll();
             totalGroups = groupRepository.count();
         }
         if(sortBy!=null){
-            Comparator<UGroup> comparator = switch (sortBy.toLowerCase()){
-                case "name" -> Comparator.comparing(UGroup::getName);
-                case "created_at" -> Comparator.comparing(UGroup::getCreatedAt);
-                case "updated_at" -> Comparator.comparing(UGroup::getUpdatedAt);
+            Comparator<Group> comparator = switch (sortBy.toLowerCase()){
+                case "name" -> Comparator.comparing(Group::getName);
+                case "created_at" -> Comparator.comparing(Group::getCreatedAt);
+                case "updated_at" -> Comparator.comparing(Group::getUpdatedAt);
                 default -> throw new IllegalArgumentException("Invalid sortBy parameter: " + sortBy);
             };
             if(sortDirection.equalsIgnoreCase("desc")){
-                UGroups.sort(comparator.reversed());
+                Groups.sort(comparator.reversed());
             }
-            UGroups.sort(comparator);
+            Groups.sort(comparator);
         }
 
         long totalPages = (totalGroups + pageSize - 1) / pageSize;
         if(page!=0){
-            List<UGroup> pagedUGroups = UGroups.stream()
+            List<Group> pagedGroups = Groups.stream()
                     .skip((long) (page - 1) * pageSize)
                     .limit(pageSize)
                     .toList();
-            groupDtosList= pagedUGroups.stream().map(this::mapToDto).collect(Collectors.toList());}
+            groupDtosList= pagedGroups.stream().map(this::mapToResponse).collect(Collectors.toList());}
         else {
-            groupDtosList= UGroups.stream().map(this::mapToDto).collect(Collectors.toList());
+            groupDtosList= Groups.stream().map(this::mapToResponse).collect(Collectors.toList());
         }
         return new SearchResponse<>(page, totalPages, groupDtosList);
     }
 
 
-    public GroupDto findById(Long id) {
+    public GroupDto.GroupResponse findById(Long id) {
         return groupRepository.findById(id)
-                .map(this::mapToDto)
+                .map(this::mapToResponse)
                 .orElseThrow(() -> new ResourceNotFoundException("Group not found with ID: " + id));
     }
 

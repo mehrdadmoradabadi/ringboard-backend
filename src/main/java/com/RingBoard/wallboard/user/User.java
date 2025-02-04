@@ -1,6 +1,6 @@
 package com.RingBoard.wallboard.user;
 
-import com.RingBoard.wallboard.ugroup.UGroup;
+import com.RingBoard.wallboard.ugroup.Group;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -41,5 +41,5 @@ public class User {
     @JoinTable(name = "user_group",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "group_id"))
-    private Set<UGroup> UGroups;
+    private Set<Group> Groups;
 }

@@ -1,9 +1,10 @@
 package com.RingBoard.wallboard.ugroup;
 
-import com.RingBoard.wallboard.dto.GroupDto;
+import com.RingBoard.wallboard.ugroup.dto.GroupDto;
 import com.RingBoard.wallboard.utils.ApiResponse;
 import com.RingBoard.wallboard.utils.SearchResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,36 +18,36 @@ public class GroupController {
     private GroupService groupService;
 
 
-    @Operation(summary = "Save a UGroup", description = "Save a UGroup and return the saved UGroup")
+    @Operation(summary = "Save a Group", description = "Save a Group and return the saved Group")
     @PostMapping("/save")
-    public ResponseEntity<ApiResponse<GroupDto>> save(@RequestBody UGroup UGroup) {
+    public ResponseEntity<ApiResponse<GroupDto.GroupResponse>> save(@Valid @RequestBody GroupDto.CreateGroupResponse Group) {
 
-            return ResponseEntity.ok(ApiResponse.success(groupService.save(UGroup)));
+            return ResponseEntity.ok(ApiResponse.success(groupService.save(Group)));
     }
 
-    @Operation(summary = "Delete a UGroup", description = "Delete a UGroup")
+    @Operation(summary = "Delete a Group", description = "Delete a Group")
     @DeleteMapping("/delete")
-    public ResponseEntity<ApiResponse<String>> delete(@RequestBody UGroup UGroup) {
-            groupService.delete(UGroup);
-            return ResponseEntity.ok(ApiResponse.success("UGroup deleted successfully"));
+    public ResponseEntity<ApiResponse<String>> delete(@Valid@RequestBody Group Group) {
+            groupService.delete(Group);
+            return ResponseEntity.ok(ApiResponse.success("Group deleted successfully"));
     }
 
     @Operation(summary = "Delete a group by name", description = "Delete a group by name")
     @DeleteMapping("/deleteByName")
-    public ResponseEntity<ApiResponse<String>> deleteByName( @RequestBody String name) {
+    public ResponseEntity<ApiResponse<String>> deleteByName(@Valid @RequestBody String name) {
             groupService.deleteByName(name);
-            return ResponseEntity.ok(ApiResponse.success("UGroup deleted successfully"));
+            return ResponseEntity.ok(ApiResponse.success("Group deleted successfully"));
     }
 
     @Operation(summary = "Find a group by name", description = "Find a group by name and return the group")
     @GetMapping("/findByName")
-    public ResponseEntity<ApiResponse<GroupDto>> findByName(@PathVariable String name) {
+    public ResponseEntity<ApiResponse<GroupDto.GroupResponse>> findByName(@PathVariable String name) {
             return ResponseEntity.ok(ApiResponse.success(groupService.findByName(name)));
     }
 
     @Operation(summary = "Find all groups", description = "Find all groups and return the list of groups")
     @GetMapping("/all")
-    public ResponseEntity<ApiResponse<SearchResponse<List<GroupDto>>>> findAll(
+    public ResponseEntity<ApiResponse<SearchResponse<List<GroupDto.GroupResponse>>>> findAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(required = false) String sortBy,
             @RequestParam(defaultValue = "asc" ) String order,
@@ -54,15 +55,15 @@ public class GroupController {
             return ResponseEntity.ok(ApiResponse.success(groupService.findAll(page, search, sortBy, order)));
     }
 
-    @Operation(summary = "Update a UGroup", description = "Update a UGroup and return the updated UGroup")
+    @Operation(summary = "Update a Group", description = "Update a Group and return the updated Group")
     @PatchMapping("/update")
-    public ResponseEntity<ApiResponse<GroupDto>> update(@RequestBody UGroup UGroup) {
-        return ResponseEntity.ok(ApiResponse.success(groupService.update(UGroup)));
+    public ResponseEntity<ApiResponse<GroupDto.GroupResponse>> update(@Valid@RequestBody GroupDto.UpdateGroupResponse updatedGroup) {
+        return ResponseEntity.ok(ApiResponse.success(groupService.update(updatedGroup)));
     }
 
     @Operation(summary = "Find a group by id", description = "Find a group by id and return the group")
     @GetMapping("/findById")
-    public ResponseEntity<ApiResponse<GroupDto>> findById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<GroupDto.GroupResponse>> findById(@Valid @PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.success(groupService.findById(id)));
     }
 }

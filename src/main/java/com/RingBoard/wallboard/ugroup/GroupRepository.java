@@ -6,11 +6,11 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface GroupRepository extends JpaRepository<UGroup, Long> {
+public interface GroupRepository extends JpaRepository<Group, Long> {
 
-    UGroup findByName(String name);
+    Group findByName(String name);
 
     void deleteByName(String name);
 
-    List<UGroup> findByNameContainingIgnoreCase(String search);
+    List<Group> findByNameContainingIgnoreCase(String search);
 }
