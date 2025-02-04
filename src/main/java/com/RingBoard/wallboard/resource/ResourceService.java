@@ -1,37 +1,59 @@
 package com.RingBoard.wallboard.resource;
 
-import com.RingBoard.wallboard.dto.ResourceDto;
+import com.RingBoard.wallboard.pbx.PBX;
+import com.RingBoard.wallboard.pbx.PBXService;
+import com.RingBoard.wallboard.resource.dto.ResourceDto;
 import com.RingBoard.wallboard.utils.ResourceNotFoundException;
 import com.RingBoard.wallboard.utils.SearchResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class ResourceService {
     @Autowired
     private ResourceRepository resourceRepository;
+    @Autowired
+    private PBXService pbxService;
 
-    private ResourceDto mapToDto(Resource resource) {
-        ResourceDto resourceDto = new ResourceDto();
+    private ResourceDto.ResourceResponse mapToResponse(Resource resource) {
+        ResourceDto.ResourceResponse resourceDto = new ResourceDto.ResourceResponse();
         resourceDto.setId(resource.getId());
         resourceDto.setName(resource.getName());
         resourceDto.setType(resource.getType());
         resourceDto.setUpdatedAt(resource.getUpdatedAt());
         return resourceDto;
     }
-    public ResourceDto create(Resource resource) {
-        return mapToDto(resourceRepository.save(resource));
+
+    private Resource mapToEntity(ResourceDto.CreateResourceRequest request) {
+        PBX pbx = pbxService.findById(request.getPbxId());
+        assert pbx != null;
+        Resource resource = new Resource();
+        resource.setName(request.getName());
+        resource.setType(request.getType());
+        resource.setPbx(pbx);
+        return resource;
     }
 
-    public SearchResponse<List<ResourceDto>> findAll(int page, String search , String sortBy, String sortDirection) {
+
+    @Transactional
+    public ResourceDto.ResourceResponse save(ResourceDto.CreateResourceRequest resourceRequest) {
+        Resource resource = mapToEntity(resourceRequest);
+        resource.setCreatedAt(ZonedDateTime.now());
+        resource.setUpdatedAt(ZonedDateTime.now());
+        return mapToResponse(resourceRepository.save(resource));
+    }
+
+    public SearchResponse<List<ResourceDto.ResourceResponse>> findAll(int page, String search , String sortBy, String sortDirection) {
         int pageSize = 10;
         List<Resource> resources;
-        List<ResourceDto> resourceDtosList;
+        List<ResourceDto.ResourceResponse> resourceDtosList;
         long totalResources;
         if (search != null && !search.isEmpty()) {
             resources = resourceRepository.findByNameContainingIgnoreCase(search);
@@ -59,45 +81,45 @@ public class ResourceService {
                     .skip((long) (page - 1) * pageSize)
                     .limit(pageSize)
                     .toList();
-            resourceDtosList = pagedResources.stream().map(this::mapToDto).toList();
+            resourceDtosList = pagedResources.stream().map(this::mapToResponse).collect(Collectors.toList());
         } else {
-            resourceDtosList = resources.stream().map(this::mapToDto).toList();
+            resourceDtosList = resources.stream().map(this::mapToResponse).collect(Collectors.toList());
         }
         return new SearchResponse<>(page, totalPages, resourceDtosList);
     }
 
-    public ResourceDto findById(Long id) {
-        return mapToDto(Objects.requireNonNull(resourceRepository.findById(id).orElse(null)));
+    public ResourceDto.ResourceResponse findById(Long id) {
+        return mapToResponse(Objects.requireNonNull(resourceRepository.findById(id).orElse(null)));
     }
 
     public void delete(Long id) {
         resourceRepository.deleteById(id);
     }
 
-    public ResourceDto update(Resource resource) {
+    public ResourceDto.ResourceResponse update(ResourceDto.UpdateResourceRequest resource) {
         Resource existingResource = resourceRepository.findById(resource.getId()).orElseThrow(() -> new ResourceNotFoundException("Resource not found with ID: " + resource.getId()));
         assert existingResource != null;
-        existingResource.setName(resource.getName());
-        existingResource.setType(resource.getType());
+        if (resource.getName() != null) existingResource.setName(resource.getName());
+        if (resource.getType() != null) existingResource.setType(resource.getType());
         existingResource.setUpdatedAt(ZonedDateTime.now());
 
-        return mapToDto(resourceRepository.save(existingResource));
+        return mapToResponse(resourceRepository.save(existingResource));
     }
 
-    public ResourceDto findByName(String name) {
+    public ResourceDto.ResourceResponse findByName(String name) {
         Resource resource = resourceRepository.findByName(name);
         if (resource == null) {
             throw new ResourceNotFoundException("Resource not found with name: " + name);
         }
-        return mapToDto(resource);
+        return mapToResponse(resource);
     }
 
-    public List<ResourceDto> findByType(String type) {
+    public List<ResourceDto.ResourceResponse> findByType(String type) {
         List<Resource> resources = resourceRepository.findByType(type);
         if (resources.isEmpty()) {
             throw new ResourceNotFoundException("No resources found with type: " + type);
         }
-        return resources.stream().map(this::mapToDto).toList();
+        return resources.stream().map(this::mapToResponse).toList();
     }
 
     public void deleteByName(String name) {
