@@ -1,11 +1,13 @@
 package com.RingBoard.wallboard.pbx;
 
-import com.RingBoard.wallboard.dto.PBXDto;
+import com.RingBoard.wallboard.pbx.dto.PBXDtos;
 import com.RingBoard.wallboard.utils.ResourceNotFoundException;
 import com.RingBoard.wallboard.utils.SearchResponse;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.ZonedDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -16,29 +18,46 @@ public class PBXService {
     @Autowired
     private PbxRepository pbxRepository;
 
-    public PBXDto mapToDto(PBX pbx) {
-        PBXDto pbxDto = new PBXDto();
-        pbxDto.setId(pbx.getId());
-        pbxDto.setName(pbx.getName());
-        pbxDto.setHost(pbx.getHost());
-        pbxDto.setPort(pbx.getPort());
-        pbxDto.setProtocol(pbx.getProtocol());
-        pbxDto.setUsername(pbx.getUsername());
-        return pbxDto;
+    private PBXDtos.PBXResponse mapToResponse(PBX pbx) {
+        PBXDtos.PBXResponse response = new PBXDtos.PBXResponse();
+        response.setId(pbx.getId());
+        response.setName(pbx.getName());
+        response.setHost(pbx.getHost());
+        response.setAriPort(pbx.getAriPort());
+        response.setAmiPort(pbx.getAmiPort());
+        response.setProtocol(pbx.getProtocol());
+        response.setUsername(pbx.getUsername());
+        response.setCreatedAt(pbx.getCreatedAt());
+        response.setUpdatedAt(pbx.getUpdatedAt());
+        response.setActive(pbx.isActive());
+        response.setAppName(pbx.getAppName());
+        return response;
+    }
+    private PBX mapToEntity(PBXDtos.CreatePBXRequest request) {
+        PBX pbx = new PBX();
+        pbx.setName(request.getName());
+        pbx.setHost(request.getHost());
+        pbx.setAriPort(request.getAriPort());
+        pbx.setAmiPort(request.getAmiPort());
+        pbx.setProtocol(request.getProtocol());
+        pbx.setUsername(request.getUsername());
+        pbx.setPassword(request.getPassword());
+        pbx.setAppName(request.getAppName());
+        return pbx;
     }
 
-    public PBXDto findByName(String name) {
+    public PBXDtos.PBXResponse findByName(String name) {
         PBX pbx = pbxRepository.findByName(name);
         if (Objects.isNull(pbx)) {
             throw new ResourceNotFoundException("PBX not found with name: " + name);
         }
-        return mapToDto(pbx);
+        return mapToResponse(pbx);
     }
 
-    public SearchResponse<List<PBXDto>> findAll(int page, String search , String sortBy, String sortDirection) {
+    public SearchResponse<List<PBXDtos.PBXResponse>> findAll(int page, String search, String sortBy, String sortDirection) {
         int pageSize = 10;
         List<PBX> pbxs;
-        List<PBXDto> pbxDtosList;
+        List<PBXDtos.PBXResponse> pbxResponseList;
         long totalPBXs;
         if (search != null && !search.isEmpty()) {
             pbxs = pbxRepository.findByNameContainingIgnoreCaseOrHostContainingIgnoreCaseOrPortContainingIgnoreCaseOrProtocolContainingIgnoreCaseOrUsernameContainingIgnoreCase(search, search, search, search, search);
@@ -51,7 +70,6 @@ public class PBXService {
             Comparator<PBX> comparator = switch (sortBy.toLowerCase()) {
                 case "name" -> Comparator.comparing(PBX::getName);
                 case "host" -> Comparator.comparing(PBX::getHost);
-                case "port" -> Comparator.comparing(PBX::getPort);
                 case "protocol" -> Comparator.comparing(PBX::getProtocol);
                 case "username" -> Comparator.comparing(PBX::getUsername);
                 case "created_at" -> Comparator.comparing(PBX::getCreatedAt);
@@ -70,23 +88,33 @@ public class PBXService {
                     .skip((long) (page - 1) * pageSize)
                     .limit(pageSize)
                     .toList();
-            pbxDtosList = pagedPBXs.stream().map(this::mapToDto).collect(Collectors.toList());}
+            pbxResponseList = pagedPBXs.stream().map(this::mapToResponse).collect(Collectors.toList());
+        }
         else{
-            pbxDtosList = pbxs.stream().map(this::mapToDto).collect(Collectors.toList());
+            pbxResponseList = pbxs.stream().map(this::mapToResponse).collect(Collectors.toList());
         }
-        return new SearchResponse<>(page,totalPages,pbxDtosList);
+        return new SearchResponse<>(page, totalPages, pbxResponseList);
     }
 
-    public PBXDto save(PBX pbx) {
-        return mapToDto(pbxRepository.save(pbx));
+    @Transactional
+    public PBXDtos.PBXResponse save(PBXDtos.CreatePBXRequest pbxRequest) {
+        PBX pbx = mapToEntity(pbxRequest);
+        pbx.setCreatedAt(ZonedDateTime.now());
+        pbx.setUpdatedAt(ZonedDateTime.now());
+        return mapToResponse(pbxRepository.save(pbx));
     }
 
-    public void delete(PBX pbx) {
-        PBX existingPbx = pbxRepository.findByNameOrHostOrId(pbx.getName(), pbx.getHost(), pbx.getId());
+    @Transactional
+    public void delete(PBXDtos.UpdatePBXRequest pbxRequest) {
+        PBX existingPbx = pbxRepository.findByNameOrHostOrId(
+                pbxRequest.getName(),
+                pbxRequest.getHost(),
+                pbxRequest.getId()
+        );
         if (existingPbx == null) {
-            throw new ResourceNotFoundException("PBX not found with name: " + pbx.getName());
+            throw new ResourceNotFoundException("PBX not found with name: " + pbxRequest.getName());
         }
-        pbxRepository.delete(pbx);
+        pbxRepository.delete(existingPbx);
     }
 
     public void deleteByName(String name) {
@@ -97,19 +125,27 @@ public class PBXService {
         pbxRepository.deleteByName(name);
     }
 
-    public PBXDto update(PBX pbx) {
-        PBX existingPbx = pbxRepository.findByNameOrHostOrId(pbx.getName(), pbx.getHost(), pbx.getId());
+    @Transactional
+    public PBXDtos.PBXResponse update(PBXDtos.UpdatePBXRequest pbxRequest) {
+        PBX existingPbx = pbxRepository.findByNameOrHostOrId(
+                pbxRequest.getName(),
+                pbxRequest.getHost(),
+                pbxRequest.getId()
+        );
         if (existingPbx == null) {
-            throw new ResourceNotFoundException("PBX not found with name: " + pbx.getName());
+            throw new ResourceNotFoundException("PBX not found with name: " + pbxRequest.getName());
         }
-        existingPbx.setName(pbx.getName());
-        existingPbx.setHost(pbx.getHost());
-        existingPbx.setPort(pbx.getPort());
-        existingPbx.setProtocol(pbx.getProtocol());
-        existingPbx.setUsername(pbx.getUsername());
-        existingPbx.setPassword(pbx.getPassword());
+        if (pbxRequest.getName() != null) existingPbx.setName(pbxRequest.getName());
+        if (pbxRequest.getHost() != null) existingPbx.setHost(pbxRequest.getHost());
+        if (pbxRequest.getAriPort() != null) existingPbx.setAriPort(pbxRequest.getAriPort());
+        if (pbxRequest.getAmiPort() != null) existingPbx.setAmiPort(pbxRequest.getAmiPort());
+        if (pbxRequest.getProtocol() != null) existingPbx.setProtocol(pbxRequest.getProtocol());
+        if (pbxRequest.getUsername() != null) existingPbx.setUsername(pbxRequest.getUsername());
+        if (pbxRequest.getPassword() != null) existingPbx.setPassword(pbxRequest.getPassword());
 
-        return mapToDto(pbxRepository.save(existingPbx));
+        existingPbx.setUpdatedAt(ZonedDateTime.now());
+
+        return mapToResponse(pbxRepository.save(existingPbx));
     }
 
     public PBX findById(String pbxId) {

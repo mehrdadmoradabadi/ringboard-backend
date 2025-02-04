@@ -25,8 +25,10 @@ public class PBX {
     private String name;
     @Column(name = "host", nullable = false)
     private String host;
-    @Column(name = "port")
-    private String port;
+    @Column(name = "ari_port")
+    private String ariPort;
+    @Column(name = "ami_port")
+    private String amiPort;
     @Column(name = "protocol")
     private String protocol;
     @Column(name = "username", nullable = false)

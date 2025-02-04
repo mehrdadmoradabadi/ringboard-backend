@@ -5,10 +5,10 @@ import ch.loway.oss.ari4java.AriVersion;
 import ch.loway.oss.ari4java.generated.models.Channel;
 import ch.loway.oss.ari4java.generated.models.Endpoint;
 import ch.loway.oss.ari4java.tools.ARIException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.RingBoard.wallboard.pbx.PBX;
 import com.RingBoard.wallboard.pbx.PBXService;
 import com.RingBoard.wallboard.utils.ResourceNotFoundException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.asteriskjava.live.AsteriskQueue;
 import org.asteriskjava.live.DefaultAsteriskServer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +33,9 @@ public class AriService {
             if (pbx == null) {
                 throw new ResourceNotFoundException( "PBX not found with ID: " + pbxId);
             }
+            Integer port = pbx.getAmiPort() != null ? Integer.parseInt(pbx.getAmiPort()) : 5038;
             DefaultAsteriskServer asteriskServer = getServerConnection(pbxId, pbx.getHost(),
-                    pbx.getUsername(), pbx.getPassword());
+                    pbx.getUsername(), pbx.getPassword(), port);
 
             List<QueueInfo> queues = new ArrayList<>();
             for (AsteriskQueue queue : asteriskServer.getQueues()) {
@@ -57,7 +58,7 @@ public class AriService {
         if (pbx == null) {
             throw new ResourceNotFoundException("PBX not found with ID: " + pbxId);
         }
-        String Host = "http://" + pbx.getHost()+":"+pbx.getPort();
+        String Host = "http://" + pbx.getHost()+":"+pbx.getAriPort();
         ARI ari = ARI.build(Host, pbx.getAppName(), pbx.getUsername(), pbx.getPassword(), AriVersion.IM_FEELING_LUCKY);
         List<AgentInfo> agentInfo = new ArrayList<>();
         for (Channel channel : ari.channels().list().execute()) {
@@ -82,7 +83,7 @@ public class AriService {
         if (pbx == null) {
             throw new ResourceNotFoundException("PBX not found with ID: " + pbxId);
         }
-        String Host = "http://" + pbx.getHost()+":"+pbx.getPort();
+        String Host = "http://" + pbx.getHost()+":"+pbx.getAriPort();
         ARI ari = ARI.build(Host, pbx.getAppName(), pbx.getUsername(), pbx.getPassword(), AriVersion.IM_FEELING_LUCKY);
         List<ExtensionInfo> extensionInfos = new ArrayList<>();
         for (Endpoint endpoint : ari.endpoints().list().execute()) {
@@ -106,7 +107,7 @@ public class AriService {
         if (pbx == null) {
             throw new ResourceNotFoundException( "PBX not found with ID: " + pbxId);
         }
-        String Host = "http://" + pbx.getHost()+":"+pbx.getPort();
+        String Host = "http://" + pbx.getHost()+":"+pbx.getAriPort();
         ARI ari = ARI.build(Host, pbx.getAppName(), pbx.getUsername(), pbx.getPassword(), AriVersion.IM_FEELING_LUCKY);
         List<TrunkInfo> trunkInfo = new ArrayList<>();
         for (Endpoint endpoint : ari.endpoints().list().execute()) {
@@ -158,9 +159,9 @@ public class AriService {
     }
 
     private DefaultAsteriskServer getServerConnection(String pbxId, String host,
-                                                      String username, String password) {
+                                                      String username, String password, Integer port) {
         return serverConnections.computeIfAbsent(pbxId,
-                id -> new DefaultAsteriskServer(host, username, password));
+                id -> new DefaultAsteriskServer(host, port, username, password));
     }
 
     private void stopStreaming(String pbxId) {
