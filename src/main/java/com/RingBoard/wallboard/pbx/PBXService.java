@@ -60,7 +60,7 @@ public class PBXService {
         List<PBXDtos.PBXResponse> pbxResponseList;
         long totalPBXs;
         if (search != null && !search.isEmpty()) {
-            pbxs = pbxRepository.findByNameContainingIgnoreCaseOrHostContainingIgnoreCaseOrPortContainingIgnoreCaseOrProtocolContainingIgnoreCaseOrUsernameContainingIgnoreCase(search, search, search, search, search);
+            pbxs = pbxRepository.searchPBX(search);
             totalPBXs= pbxs.size();
         } else {
             pbxs = pbxRepository.findAll();

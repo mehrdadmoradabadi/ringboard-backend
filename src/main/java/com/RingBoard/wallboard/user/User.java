@@ -41,5 +41,5 @@ public class User {
     @JoinTable(name = "user_group",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "group_id"))
-    private Set<Group> Groups;
+    private Set<Group> groups;
 }

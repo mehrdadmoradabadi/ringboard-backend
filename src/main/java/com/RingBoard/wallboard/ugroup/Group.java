@@ -12,7 +12,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@Table(name = "groups")
+@Table(name = "user_groups")
 public class Group {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +27,7 @@ public class Group {
     @Column(name = "updated_at")
     private ZonedDateTime updatedAt = ZonedDateTime.now();
 
-    @ManyToMany(mappedBy = "UGroups")
+    @ManyToMany(mappedBy = "groups")
     private Set<User> users;
 
 }

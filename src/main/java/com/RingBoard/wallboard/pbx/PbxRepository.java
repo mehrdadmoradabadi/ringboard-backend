@@ -1,6 +1,8 @@
 package com.RingBoard.wallboard.pbx;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,7 +15,14 @@ public interface PbxRepository extends JpaRepository<PBX, Integer> {
 
     void deleteByName(String name);
 
-    List<PBX> findByNameContainingIgnoreCaseOrHostContainingIgnoreCaseOrPortContainingIgnoreCaseOrProtocolContainingIgnoreCaseOrUsernameContainingIgnoreCase(String search, String search1, String search2, String search3, String search4);
+    @Query("SELECT p FROM PBX p WHERE " +
+            "LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "LOWER(p.host) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "LOWER(p.ariPort) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "LOWER(p.amiPort) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "LOWER(p.protocol) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "LOWER(p.username) LIKE LOWER(CONCAT('%', :search, '%'))")
+    List<PBX> searchPBX(@Param("search") String search);
 
     PBX findByNameOrHostOrId(String name , String host, Integer id);
 }
