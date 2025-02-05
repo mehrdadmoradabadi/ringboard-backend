@@ -17,6 +17,9 @@ import java.util.List;
 public class PBXController {
     @Autowired
     private PBXService pbxService;
+    @Autowired
+    private PBXSyncService pbxSyncService;
+
 
 
     @Operation(summary = "Find all pbx", description = "Find all pbx and return the list of pbx")
@@ -57,6 +60,19 @@ public class PBXController {
         return ResponseEntity.ok(ApiResponse.success(pbxService.update(pbxRequest)));
     }
 
+    @Operation(summary = "Sync PBX resources", description = "Fetch all resources from PBX and save them to database")
+    @PostMapping("/{pbxId}/sync-resources")
+    public ResponseEntity<ApiResponse<String>> syncResources(@PathVariable String pbxId) {
+        pbxSyncService.syncPBXResources(pbxId);
+        return ResponseEntity.ok(ApiResponse.success("PBX resources synchronized successfully"));
+    }
+
+    @Operation(summary = "Refresh PBX resources", description = "Delete existing resources and fetch fresh data from PBX")
+    @PostMapping("/{pbxId}/refresh-resources")
+    public ResponseEntity<ApiResponse<String>> refreshResources(@PathVariable String pbxId) {
+        pbxSyncService.refreshPBXResources(pbxId);
+        return ResponseEntity.ok(ApiResponse.success("PBX resources refreshed successfully"));
+    }
 
 //This is for test. TODO remove later
     @GetMapping("/threads")

@@ -129,5 +129,22 @@ public class ResourceService {
         }
         resourceRepository.deleteByName(name);
     }
+    @Transactional
+    public void deleteByPBXId(String pbxId) {
+        PBX pbx = pbxService.findById(pbxId);
+        if (pbx == null) {
+            throw new ResourceNotFoundException("PBX not found with ID: " + pbxId);
+        }
+        resourceRepository.deleteByPbx(pbx);
+    }
+
+    public List<ResourceDto.ResourceResponse> findByPBXId(String pbxId) {
+        PBX pbx = pbxService.findById(pbxId);
+        if (pbx == null) {
+            throw new ResourceNotFoundException("PBX not found with ID: " + pbxId);
+        }
+        List<Resource> resources = resourceRepository.findByPbx(pbx);
+        return resources.stream().map(this::mapToResponse).collect(Collectors.toList());
+    }
 
 }

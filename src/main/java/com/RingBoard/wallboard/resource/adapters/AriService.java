@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.asteriskjava.live.AsteriskQueue;
 import org.asteriskjava.live.DefaultAsteriskServer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
@@ -22,11 +23,15 @@ import java.util.concurrent.ConcurrentMap;
 
 @Service
 public class AriService {
-    @Autowired
-    private PBXService pbxService;
+    private final PBXService pbxService;
     private final ConcurrentMap<String, Thread> pbxThreads = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, DefaultAsteriskServer> serverConnections = new ConcurrentHashMap<>();
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Autowired
+    public AriService(@Lazy PBXService pbxService) {
+        this.pbxService = pbxService;
+    }
     public List<QueueInfo> getQueues(String pbxId) {
         try {
             PBX pbx = pbxService.findById(pbxId);
