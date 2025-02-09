@@ -21,7 +21,6 @@ public class PBXSyncService {
     public void syncPBXResources(String pbxId) {
         try {
             List<QueueInfo> queues = ariService.getQueues(pbxId);
-            List<AgentInfo> agents = ariService.getAgents(pbxId);
             List<ExtensionInfo> extensions = ariService.getExtensions(pbxId);
             List<TrunkInfo> trunks = ariService.getTrunks(pbxId);
 
@@ -29,14 +28,6 @@ public class PBXSyncService {
                 ResourceDto.CreateResourceRequest request = new ResourceDto.CreateResourceRequest();
                 request.setName(queue.getName());
                 request.setType("QUEUE");
-                request.setPbxId(pbxId);
-                resourceService.save(request);
-            }
-
-            for (AgentInfo agent : agents) {
-                ResourceDto.CreateResourceRequest request = new ResourceDto.CreateResourceRequest();
-                request.setName(agent.getName());
-                request.setType("AGENT");
                 request.setPbxId(pbxId);
                 resourceService.save(request);
             }

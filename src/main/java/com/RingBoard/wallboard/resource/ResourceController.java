@@ -1,20 +1,20 @@
 package com.RingBoard.wallboard.resource;
 
 import ch.loway.oss.ari4java.tools.ARIException;
+import com.RingBoard.wallboard.resource.adapters.AriService;
+import com.RingBoard.wallboard.resource.adapters.ExtensionInfo;
+import com.RingBoard.wallboard.resource.adapters.QueueInfo;
+import com.RingBoard.wallboard.resource.adapters.TrunkInfo;
 import com.RingBoard.wallboard.resource.dto.ResourceDto;
-import com.RingBoard.wallboard.resource.adapters.*;
 import com.RingBoard.wallboard.utils.ApiResponse;
 import com.RingBoard.wallboard.utils.IDNormalizer;
 import com.RingBoard.wallboard.utils.SearchResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
 
-import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -96,12 +96,7 @@ public class ResourceController {
             return ResponseEntity.ok(ApiResponse.success(asteriskService.getQueues(pbxID)));
     }
 
-    @GetMapping("/agents")
-    public ResponseEntity<ApiResponse<List<AgentInfo>>> getAgents(@RequestParam String pbxID) throws ARIException {
 
-            pbxID = IDNormalizer.normalize(pbxID);
-            return ResponseEntity.ok(ApiResponse.success(asteriskService.getAgents(pbxID)));
-    }
 
     @GetMapping("/extensions")
     public ResponseEntity<ApiResponse<List<ExtensionInfo>>> getExtensions(@RequestParam String pbxID) throws ARIException {
@@ -113,12 +108,6 @@ public class ResourceController {
     public ResponseEntity<ApiResponse<List<TrunkInfo>>> getTrunks(@RequestParam String pbxID) throws ARIException {
             pbxID = IDNormalizer.normalize(pbxID);
             return ResponseEntity.ok(ApiResponse.success(asteriskService.getTrunks(pbxID)));
-    }
-
-    @Operation(summary = "Stream updates from a PBX", description = "Stream updates from a PBX")
-    @GetMapping(path = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<String> streamPBXUpdates(@RequestBody HashMap<String, String> data) {
-        return asteriskService.streamUpdates(data.get("pbxId"), data.get("interval"));
     }
 
 }
