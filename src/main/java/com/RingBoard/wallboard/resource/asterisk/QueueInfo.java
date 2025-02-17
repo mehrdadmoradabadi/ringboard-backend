@@ -1,4 +1,4 @@
-package com.RingBoard.wallboard.resource.adapters;
+package com.RingBoard.wallboard.resource.asterisk;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

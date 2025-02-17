@@ -1,4 +1,4 @@
-package com.RingBoard.wallboard.resource.adapters;
+package com.RingBoard.wallboard.resource.asterisk;
 
 import ch.loway.oss.ari4java.ARI;
 import ch.loway.oss.ari4java.AriVersion;

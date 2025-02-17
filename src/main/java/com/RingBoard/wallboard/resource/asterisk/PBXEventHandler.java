@@ -1,4 +1,4 @@
-package com.RingBoard.wallboard.resource.adapters;
+package com.RingBoard.wallboard.resource.asterisk;
 
 import com.RingBoard.wallboard.pbx.PBX;
 import com.RingBoard.wallboard.pbx.PBXService;
