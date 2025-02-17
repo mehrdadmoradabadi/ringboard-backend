@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ public class PBXController {
             @RequestParam(required = false) String search) {
         return ResponseEntity.ok(ApiResponse.success(pbxService.findAll(page, search, sortBy, order)));
     }
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Save a pbx", description = "Save a pbx and return the saved pbx")
     @PostMapping("/save")
     public ResponseEntity<ApiResponse<PBXDtos.PBXResponse>> save(
@@ -38,6 +40,7 @@ public class PBXController {
         return ResponseEntity.ok(ApiResponse.success(pbxService.save(pbxRequest)));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Delete a pbx", description = "Delete a pbx")
     @DeleteMapping("/delete")
     public ResponseEntity<ApiResponse<String>> delete(
@@ -53,6 +56,7 @@ public class PBXController {
         return ResponseEntity.ok(ApiResponse.success(pbxService.findByName(name)));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update a pbx", description = "Update a pbx and return the updated pbx")
     @PatchMapping("/update")
     public ResponseEntity<ApiResponse<PBXDtos.PBXResponse>> update(

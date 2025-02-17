@@ -1,7 +1,7 @@
 package com.RingBoard.wallboard.pbx;
 
 import com.RingBoard.wallboard.resource.ResourceService;
-import com.RingBoard.wallboard.resource.adapters.*;
+import com.RingBoard.wallboard.resource.asterisk.*;
 import com.RingBoard.wallboard.resource.dto.ResourceDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

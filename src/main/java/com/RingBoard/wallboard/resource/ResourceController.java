@@ -1,10 +1,10 @@
 package com.RingBoard.wallboard.resource;
 
 import ch.loway.oss.ari4java.tools.ARIException;
-import com.RingBoard.wallboard.resource.adapters.AriService;
-import com.RingBoard.wallboard.resource.adapters.ExtensionInfo;
-import com.RingBoard.wallboard.resource.adapters.QueueInfo;
-import com.RingBoard.wallboard.resource.adapters.TrunkInfo;
+import com.RingBoard.wallboard.resource.asterisk.AriService;
+import com.RingBoard.wallboard.resource.asterisk.ExtensionInfo;
+import com.RingBoard.wallboard.resource.asterisk.QueueInfo;
+import com.RingBoard.wallboard.resource.asterisk.TrunkInfo;
 import com.RingBoard.wallboard.resource.dto.ResourceDto;
 import com.RingBoard.wallboard.utils.ApiResponse;
 import com.RingBoard.wallboard.utils.IDNormalizer;
@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,6 +27,7 @@ public class ResourceController {
 
 
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Create a resource", description = "Create a resource")
     @PostMapping("/create")
     public ResponseEntity<ApiResponse<ResourceDto.ResourceResponse>> create(@Valid  @RequestBody ResourceDto.CreateResourceRequest resource) {
@@ -33,6 +35,7 @@ public class ResourceController {
         return ResponseEntity.ok(ApiResponse.success(resourceService.save(resource)));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update a resource", description = "Update a resource")
     @PatchMapping("/update")
     public ResponseEntity<ApiResponse<ResourceDto.ResourceResponse>> update(@Valid @RequestBody ResourceDto.UpdateResourceRequest resource) {
@@ -40,6 +43,7 @@ public class ResourceController {
         return ResponseEntity.ok(ApiResponse.success(resourceService.update(resource)));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Delete a resource", description = "Delete a resource")
     @DeleteMapping("/delete")
     public ResponseEntity<ApiResponse<String>> delete(@RequestBody String id) {
@@ -80,6 +84,7 @@ public class ResourceController {
             return ResponseEntity.ok(ApiResponse.success(resourceService.findById(Long.valueOf(id))));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Delete a resource by name", description = "Delete a resource by name")
     @DeleteMapping("/deleteByName")
     public ResponseEntity<ApiResponse<String>> deleteByName(@RequestBody String name) {
