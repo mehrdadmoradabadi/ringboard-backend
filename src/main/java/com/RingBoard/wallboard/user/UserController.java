@@ -5,6 +5,7 @@ import com.RingBoard.wallboard.utils.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,14 +19,10 @@ public class UserController {
     private UserService userService;
 
     @Operation(summary = "Get all users", description = "Get all users")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/all")
     public ResponseEntity<ApiResponse<List<UserDto.UserResponse>>> getAllUsers() {
         return ResponseEntity.ok(ApiResponse.success(userService.getAllUsers()));
 
-    }
-
-    @GetMapping("/save")
-    public ResponseEntity<ApiResponse<String>> saveUser() {
-        return ResponseEntity.ok(ApiResponse.success("Done"));
     }
 }

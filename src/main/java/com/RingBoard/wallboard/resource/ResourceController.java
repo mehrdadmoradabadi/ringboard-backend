@@ -23,7 +23,8 @@ import java.util.List;
 public class ResourceController {
     @Autowired
     private  ResourceService resourceService;
-
+    @Autowired
+    private AriService asteriskService;
 
 
 
@@ -54,12 +55,14 @@ public class ResourceController {
 
     @Operation(summary = "Find a resource by name", description = "Find a resource by name")
     @GetMapping("/findByName")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<ApiResponse<ResourceDto.ResourceResponse>> findByName(@RequestBody String name) {
             return ResponseEntity.ok(ApiResponse.success(resourceService.findByName(name)));
     }
 
     @Operation(summary = "Find a resource by type", description = "Find a resource by type")
     @GetMapping("/findByType")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<ApiResponse<List<ResourceDto.ResourceResponse>>> findByType(@RequestBody String type) {
 
         return ResponseEntity.ok(ApiResponse.success(resourceService.findByType(type)));
@@ -67,6 +70,7 @@ public class ResourceController {
 
     @Operation(summary = "Find all resources", description = "Find all resources")
     @GetMapping("/findAll")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<ApiResponse<SearchResponse<List<ResourceDto.ResourceResponse>>>> findAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(required = false) String sortBy,
@@ -78,6 +82,7 @@ public class ResourceController {
 
     @Operation(summary = "Find a resource by id", description = "Find a resource by id")
     @GetMapping("/findById")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<ApiResponse<ResourceDto.ResourceResponse>> findById(@RequestBody String id) {
 
             id = IDNormalizer.normalize(id);
@@ -93,9 +98,9 @@ public class ResourceController {
         return ResponseEntity.ok(ApiResponse.success("Resource deleted successfully"));
     }
 
-    @Autowired
-    private AriService asteriskService;
+    @Operation(summary = "Find all queues", description = "Find all queues")
     @GetMapping("/queues")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<ApiResponse<List<QueueInfo>>> getQueues(@RequestParam String pbxID) {
         pbxID = IDNormalizer.normalize(pbxID);
             return ResponseEntity.ok(ApiResponse.success(asteriskService.getQueues(pbxID)));
@@ -103,12 +108,16 @@ public class ResourceController {
 
 
 
+    @Operation(summary = "Find all extensions", description = "Find all extensions")
     @GetMapping("/extensions")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<ApiResponse<List<ExtensionInfo>>> getExtensions(@RequestParam String pbxID) throws ARIException {
             pbxID = IDNormalizer.normalize(pbxID);
             return ResponseEntity.ok(ApiResponse.success(asteriskService.getExtensions(pbxID)));
     }
 
+    @Operation(summary = "Find all trunks", description = "Find all trunks")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping("/trunks")
     public ResponseEntity<ApiResponse<List<TrunkInfo>>> getTrunks(@RequestParam String pbxID) throws ARIException {
             pbxID = IDNormalizer.normalize(pbxID);

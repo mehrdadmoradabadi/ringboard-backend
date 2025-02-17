@@ -25,6 +25,7 @@ public class PBXController {
 
     @Operation(summary = "Find all pbx", description = "Find all pbx and return the list of pbx")
     @GetMapping("/all")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<ApiResponse<SearchResponse<List<PBXDtos.PBXResponse>>>> findAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(required = false) String sortBy,
@@ -51,6 +52,7 @@ public class PBXController {
 
     @Operation(summary = "Find a pbx by name", description = "Find a pbx by name and return the pbx")
     @GetMapping("/findByName/{name}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<ApiResponse<PBXDtos.PBXResponse>> findByName(
             @PathVariable String name) {
         return ResponseEntity.ok(ApiResponse.success(pbxService.findByName(name)));
@@ -66,6 +68,7 @@ public class PBXController {
 
     @Operation(summary = "Sync PBX resources", description = "Fetch all resources from PBX and save them to database")
     @PostMapping("/{pbxId}/sync-resources")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<ApiResponse<String>> syncResources(@PathVariable String pbxId) {
         pbxSyncService.syncPBXResources(pbxId);
         return ResponseEntity.ok(ApiResponse.success("PBX resources synchronized successfully"));
@@ -73,6 +76,7 @@ public class PBXController {
 
     @Operation(summary = "Refresh PBX resources", description = "Delete existing resources and fetch fresh data from PBX")
     @PostMapping("/{pbxId}/refresh-resources")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<ApiResponse<String>> refreshResources(@PathVariable String pbxId) {
         pbxSyncService.refreshPBXResources(pbxId);
         return ResponseEntity.ok(ApiResponse.success("PBX resources refreshed successfully"));
