@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.security.auth.login.AccountLockedException;
 import java.util.InputMismatchException;
 
 @RestControllerAdvice // Enables centralized exception handling
@@ -20,10 +21,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.badRequest(ex.getMessage()));
     }
-
+    @ExceptionHandler({AccountLockedException.class, InvalidCredentialsException.class})
+    public ResponseEntity<ApiResponse<String>> handleAccountAuth(Exception ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.unauthorized( ex.getMessage()));
+    }
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<String>> handleInternalServerError(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ApiResponse.internalError("An unexpected error occurred: " + ex.getMessage()));
     }
+
+
 }

@@ -28,6 +28,9 @@ public class ApiResponse<T> {
     public static <T> ApiResponse<T> badRequest(String message) {
         return new ApiResponse<>(ApiResponseCode.BAD_REQUEST, message, null);
     }
+    public static <T> ApiResponse<T> unauthorized(String message) {
+        return new ApiResponse<>(ApiResponseCode.UNAUTHORIZED, message, null);
+    }
     public static <T> ApiResponse<T> internalError(String message) {
         return new ApiResponse<>(ApiResponseCode.SERVER_ERROR, message, null);
     }
