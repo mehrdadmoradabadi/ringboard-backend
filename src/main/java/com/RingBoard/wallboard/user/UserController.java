@@ -1,6 +1,8 @@
 package com.RingBoard.wallboard.user;
 
+import com.RingBoard.wallboard.user.dto.UserDto;
 import com.RingBoard.wallboard.utils.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,20 +17,15 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Operation(summary = "Get all users", description = "Get all users")
     @GetMapping("/all")
-    public ResponseEntity<ApiResponse<List<User>>> getAllUsers() {
+    public ResponseEntity<ApiResponse<List<UserDto.UserResponse>>> getAllUsers() {
         return ResponseEntity.ok(ApiResponse.success(userService.getAllUsers()));
 
     }
 
     @GetMapping("/save")
     public ResponseEntity<ApiResponse<String>> saveUser() {
-        User User = new User();
-        User.setUsername("test2");
-        User.setEmail("test2");
-        User.setRole("test2");
-        User.setHashedPassword("test22");
-        userService.saveUser(User);
         return ResponseEntity.ok(ApiResponse.success("Done"));
     }
 }
