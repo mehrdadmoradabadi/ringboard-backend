@@ -20,12 +20,20 @@ public class UserService {
     private UserRepository userRepository;
 
     @PreAuthorize("hasRole('ADMIN')")
-    public User promoteToAdmin(Integer userId) {
+    public void promoteToAdmin(Integer userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
         user.setRole(UserRole.ADMIN);
         user.setUpdatedAt(ZonedDateTime.now());
-        return userRepository.save(user);
+        userRepository.save(user);
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    public void demoteToUser(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
+        user.setRole(UserRole.USER);
+        user.setUpdatedAt(ZonedDateTime.now());
+        userRepository.save(user);
     }
     private UserDto.UserResponse mapToResponse(User user) {
         UserDto.UserResponse response = new UserDto.UserResponse();
@@ -44,9 +52,10 @@ public class UserService {
     }
 
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public User getCurrentUserProfile() {
+    public UserDto.UserResponse getCurrentUserProfile() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        return userRepository.findByUsername(username);
+
+        return mapToResponse(userRepository.findByUsername(username));
     }
 
     public boolean isSessionValid(String sessionToken) {

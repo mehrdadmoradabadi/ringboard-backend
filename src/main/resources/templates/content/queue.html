@@ -1,0 +1,191 @@
+<div class="animation-container" id="queueContainer">
+  <div class="header-controls">
+    <h2>Queues</h2>
+    <button
+      id="fullscreenBtn"
+      class="fullscreen-btn"
+      onclick="toggleFullscreen()"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path
+          d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"
+        ></path>
+      </svg>
+    </button>
+  </div>
+
+  <div class="pbx-selector">
+    <select id="pbxSelector" onchange="changePBX(this.value)">
+      <option value="">Select PBX</option>
+      <th:block th:each="pbx : ${pbxList}">
+        <option
+          th:value="${pbx.id}"
+          th:text="${pbx.name}"
+          th:selected="${pbx.id == pbxId}"
+        ></option>
+      </th:block>
+    </select>
+  </div>
+
+  <div class="queues-grid" id="queuesGrid">
+    <!-- Queues will be dynamically added here -->
+  </div>
+
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
+  <script th:inline="javascript">
+    let currentPbxId = /*[[${pbxId}]]*/ "";
+    let ws;
+    let queuesData = {};
+
+    function createQueueElement(queueId) {
+      const queueDiv = document.createElement("div");
+      queueDiv.className = "queue-container";
+      queueDiv.id = "queue-" + queueId;
+
+      queueDiv.innerHTML = `
+                <div class="queue-header">
+                    <h3>${queueId}</h3>
+                </div>
+                <lottie-player
+                    src="svg/queue.json"
+                    background="transparent"
+                    speed="1"
+                    style="width: auto; height: 80px"
+                    loop
+                    autoplay>
+                </lottie-player>
+                <section class="queue-data">
+                    <p class="member-count">Members: 0</p>
+                    <p class="abandoned">Abandoned: 0</p>
+                    <p class="waiting">Waiting: 0</p>
+                    <p class="completed">Completed: 0</p>
+                </section>
+            `;
+
+      document.getElementById("queuesGrid").appendChild(queueDiv);
+      return queueDiv;
+    }
+
+    function updateQueueDisplay(queueId, data) {
+      let queueContainer = document.getElementById("queue-" + queueId);
+      if (!queueContainer) {
+        queueContainer = createQueueElement(queueId);
+      }
+
+      if (!queuesData[queueId]) {
+        queuesData[queueId] = {
+          memberCount: 0,
+          abandoned: 0,
+          waiting: 0,
+          completed: 0,
+        };
+      }
+
+      const queueData = queuesData[queueId];
+
+      switch (data.eventType) {
+        case "QUEUE_MEMBER_STATUS":
+          if (data.additionalData && data.additionalData.memberCount) {
+            queueData.memberCount = data.additionalData.memberCount;
+            queueContainer.querySelector(
+              ".member-count"
+            ).textContent = `Members: ${queueData.memberCount}`;
+          }
+          break;
+
+        case "QUEUE_CALLER_ABANDON":
+          queueData.abandoned++;
+          queueContainer.querySelector(
+            ".abandoned"
+          ).textContent = `Abandoned: ${queueData.abandoned}`;
+          break;
+
+        case "QUEUE_CALLER_JOIN":
+          if (data.additionalData && data.additionalData.count) {
+            queueData.waiting = data.additionalData.count;
+            queueContainer.querySelector(
+              ".waiting"
+            ).textContent = `Waiting: ${queueData.waiting}`;
+          }
+          break;
+      }
+    }
+
+    function connectWebSocket(pbxId) {
+      if (ws) {
+        ws.close();
+      }
+
+      // Clear existing queues when connecting to a new PBX
+      document.getElementById("queuesGrid").innerHTML = "";
+      queuesData = {};
+
+      ws = new WebSocket(
+        `ws://${window.location.host}/pbx/events?category=queue&pbxId=${pbxId}`
+      );
+
+      ws.onmessage = function (event) {
+        const data = JSON.parse(event.data);
+
+        if (data.category === "queue") {
+          updateQueueDisplay(data.deviceId, data);
+        }
+      };
+
+      ws.onclose = function () {
+        console.log("WebSocket connection closed");
+      };
+
+      ws.onerror = function (error) {
+        console.error("WebSocket error:", error);
+      };
+    }
+
+    // Fullscreen toggle function
+    function toggleFullscreen() {
+      const container = document.getElementById("queueContainer");
+      if (!document.fullscreenElement) {
+        if (container.requestFullscreen) {
+          container.requestFullscreen();
+        } else if (container.webkitRequestFullscreen) {
+          container.webkitRequestFullscreen();
+        } else if (container.msRequestFullscreen) {
+          container.msRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) {
+          document.msExitFullscreen();
+        }
+      }
+    }
+
+    function changePBX(pbxId) {
+      if (pbxId) {
+        currentPbxId = pbxId;
+        window.history.pushState({}, "", `?pbxId=${pbxId}`);
+        connectWebSocket(pbxId);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      if (currentPbxId) {
+        connectWebSocket(currentPbxId);
+      }
+    });
+  </script>
+</div>
