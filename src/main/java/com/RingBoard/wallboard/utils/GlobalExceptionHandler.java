@@ -2,6 +2,8 @@ package com.RingBoard.wallboard.utils;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -21,7 +23,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.badRequest(ex.getMessage()));
     }
-    @ExceptionHandler({AccountLockedException.class, InvalidCredentialsException.class})
+    @ExceptionHandler({AccountLockedException.class, InvalidCredentialsException.class,AuthenticationException.class})
     public ResponseEntity<ApiResponse<String>> handleAccountAuth(Exception ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(ApiResponse.unauthorized( ex.getMessage()));
@@ -31,6 +33,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ApiResponse.internalError("An unexpected error occurred: " + ex.getMessage()));
     }
-
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiResponse<String>> handleAccessDenied(AccessDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ApiResponse.forbidden("Access Denied: You don't have permission to access this resource"));
+    }
 
 }

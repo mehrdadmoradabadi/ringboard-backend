@@ -34,5 +34,8 @@ public class ApiResponse<T> {
     public static <T> ApiResponse<T> internalError(String message) {
         return new ApiResponse<>(ApiResponseCode.SERVER_ERROR, message, null);
     }
+    public static <T> ApiResponse<T> forbidden(String message) {
+        return new ApiResponse<>(ApiResponseCode.FORBIDDEN, message, null);
+    }
 }
 
