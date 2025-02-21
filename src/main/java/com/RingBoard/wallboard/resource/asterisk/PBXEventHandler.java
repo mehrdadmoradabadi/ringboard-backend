@@ -38,13 +38,11 @@ public class PBXEventHandler extends TextWebSocketHandler {
             String pbxId = extractPbxId(session);
             String category = extractCategory(session);
 
-            // Validate PBX exists
             PBX pbx = pbxService.findById(pbxId);
             if (pbx == null) {
                 session.close(CloseStatus.BAD_DATA);
                 return;
             }
-            // Validate category
             if (!sessionsByCategory.containsKey(category)) {
                 session.close(CloseStatus.BAD_DATA);
                 return;
@@ -129,7 +127,6 @@ public class PBXEventHandler extends TextWebSocketHandler {
                         !(event instanceof AgentCallbackLogoffEvent) &&
                         !(event instanceof AgentConnectEvent) &&
                         !(event instanceof PeerEntryEvent)) {
-                    // Skip events we don't care about
                     return;
                 }
                 PBXEvent pbxEvent = new PBXEvent();
@@ -277,7 +274,6 @@ public class PBXEventHandler extends TextWebSocketHandler {
         private void broadcastEvent(PBXEvent event) throws Exception {
             String jsonEvent = objectMapper.writeValueAsString(event);
 
-            // Broadcast to specific category subscribers
             Set<WebSocketSession> categorySessions = sessionsByCategory.get(event.getCategory());
             if (categorySessions != null) {
                 for (WebSocketSession session : categorySessions) {
@@ -287,7 +283,6 @@ public class PBXEventHandler extends TextWebSocketHandler {
                 }
             }
 
-            // Broadcast to 'all' category subscribers
             Set<WebSocketSession> allSessions = sessionsByCategory.get("all");
             if (allSessions != null) {
                 for (WebSocketSession session : allSessions) {

@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ApiResponse<T> {
-    private String responseCode; // Custom response codes like "200", "400", etc.
-    private String message;      // Response message
-    private T result;            // Actual payload (data)
+    private String responseCode;
+    private String message;
+    private T result;
 
     public static <T> ApiResponse<T> success(T result) {
         return new ApiResponse<>(ApiResponseCode.SUCCESS, "Successful", result);

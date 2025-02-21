@@ -61,7 +61,7 @@ public class AuthService {
             User user = new User();
             user.setUsername("admin");
             user.setEmail("admin@example.com");
-            user.setHashedPassword(passwordEncoder.encode("admin123")); // Change the password after first login
+            user.setHashedPassword(passwordEncoder.encode("admin123"));
             user.setRole(UserRole.ADMIN);
             user.setCreatedAt(ZonedDateTime.now());
             user.setUpdatedAt(ZonedDateTime.now());
@@ -147,16 +147,11 @@ public class AuthService {
     }
 
     public ApiResponse<String> changePassword(UserDto.ChangePasswordRequest request) {
-        // Get current authenticated user
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByUsername(username);
-
-        // Verify old password
         if (!passwordEncoder.matches(request.getOldPassword(), user.getHashedPassword())) {
             throw new RuntimeException("Current password is incorrect");
         }
-
-        // Update password
         user.setHashedPassword(passwordEncoder.encode(request.getNewPassword()));
         user.setUpdatedAt(ZonedDateTime.now());
         userRepository.save(user);

@@ -21,7 +21,6 @@ import java.util.concurrent.ConcurrentMap;
 @Service
 public class AriService {
     private final PBXService pbxService;
-//    private final ConcurrentMap<String, Thread> pbxThreads = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, DefaultAsteriskServer> serverConnections = new ConcurrentHashMap<>();
 
     @Autowired

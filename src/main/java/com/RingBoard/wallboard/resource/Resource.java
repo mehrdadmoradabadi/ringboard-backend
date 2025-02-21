@@ -1,6 +1,5 @@
 package com.RingBoard.wallboard.resource;
 
-//import com.wallboard.wallboard.pbx.PBX;
 
 import com.RingBoard.wallboard.pbx.PBX;
 import jakarta.persistence.*;

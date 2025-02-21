@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import javax.security.auth.login.AccountLockedException;
 import java.util.InputMismatchException;
 
-@RestControllerAdvice // Enables centralized exception handling
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)

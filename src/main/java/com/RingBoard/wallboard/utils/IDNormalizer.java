@@ -18,7 +18,7 @@ public class IDNormalizer {
             } catch (NumberFormatException e) {
                 throw new IllegalArgumentException("Invalid PBX ID: " + encodedID);
             }
-        } else if (encodedID.matches(".*\\D.*")) {  // Contains non-digit characters
+        } else if (encodedID.matches(".*\\D.*")) {
             throw new IllegalArgumentException("PBX ID should only contain numbers, received: " + encodedID);
         }
 
