@@ -4,7 +4,7 @@
 
 ![RingBoard Logo](./src/main/resources/static/logo.webp)
 
-A modern, enterprise-grade PBX management system powered by Spring Boot and Asterisk
+A modern, enterprise-grade PBX Monitoring system powered by Spring Boot and Asterisk
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-1.0.0-green.svg)](https://github.com/yourusername/ringboard/releases)
@@ -14,7 +14,7 @@ A modern, enterprise-grade PBX management system powered by Spring Boot and Aste
 
 ## 🎯 Overview
 
-RingBoard is an open-source solution designed to simplify enterprise telephony management with seamless integration into Asterisk PBX. As a VoIP engineer with years of experience in call centers, I know how critical it is to have real-time insights into call processes—like total calls, abandoned calls, and other key reports.
+RingBoard is an open-source solution designed to simplify an enterprise telephony Monitoring system with seamless integration into Asterisk PBX. As a VoIP engineer with years of experience in call centers, I know how critical it is to have real-time insights into call processes—like total calls, abandoned calls, and other key reports on a single dashboard.
 
 From my experience, there’s no free or open-source tool that provides these essential analytics for call centers. That’s why I built RingBoard—to give admins and call center managers a free and flexible alternative.
 
@@ -45,10 +45,10 @@ but If you want to contribute, Please follow these steps:
 - 📈 **Advanced Monitoring**: Detailed logging, metrics, and health monitoring
 
 ##  Features
-- **PBX Management**
+- **PBX Monitoring**
     - Extension configuration
     - Call routing rules
-    - IVR management
+    - IVR Monitoring
     - Queue administration
 - **PBX API**
     - REST API for managing PBX systems
